@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
+import MediaPicker from "@/components/admin/MediaPicker"
 
 export default function EditPublicationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -9,6 +10,7 @@ export default function EditPublicationPage({ params }: { params: Promise<{ id: 
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [link, setLink] = useState("")
+  const [imageUrl, setImageUrl] = useState("")
   const [category, setCategory] = useState("book")
   const [sortOrder, setSortOrder] = useState("0")
   const [saving, setSaving] = useState(false)
@@ -22,6 +24,7 @@ export default function EditPublicationPage({ params }: { params: Promise<{ id: 
         setTitle(data.title || "")
         setDescription(data.description || "")
         setLink(data.link || "")
+        setImageUrl(data.imageUrl || "")
         setCategory(data.category || "book")
         setSortOrder(String(data.sortOrder ?? 0))
         setLoading(false)
@@ -40,6 +43,7 @@ export default function EditPublicationPage({ params }: { params: Promise<{ id: 
         title,
         description: description || null,
         link: link || null,
+        imageUrl: imageUrl || null,
         category,
         sortOrder: Number(sortOrder),
       }),
@@ -97,6 +101,8 @@ export default function EditPublicationPage({ params }: { params: Promise<{ id: 
           />
         </div>
 
+        <MediaPicker label="Cover Image" value={imageUrl} onChange={setImageUrl} />
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -106,7 +112,8 @@ export default function EditPublicationPage({ params }: { params: Promise<{ id: 
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
             >
               <option value="book">Book</option>
-              <option value="journal">Journal Article</option>
+              <option value="journal">Journal</option>
+              <option value="article">Article</option>
               <option value="conference">Conference Paper</option>
               <option value="report">Report</option>
               <option value="other">Other</option>

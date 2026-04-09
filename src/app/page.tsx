@@ -2,25 +2,30 @@ import Link from "next/link";
 import Image from "next/image";
 import PersonCard from "@/components/PersonCard";
 import { prisma } from "@/lib/prisma";
-import { FaPaintBrush, FaAddressCard, FaUsers } from "react-icons/fa";
+import { FaPaintBrush, FaAddressBook, FaUsers, FaQuoteLeft } from "react-icons/fa";
+
+function parseSocialLinks(val: string | null | undefined): Record<string, string> | undefined {
+  if (!val) return undefined;
+  try { return typeof val === "string" ? JSON.parse(val) : val; } catch { return undefined; }
+}
 
 const mediaLogos = [
-  "Wired",
-  "Discover",
-  "The Washington Post",
-  "Financial Times",
-  "Women's Health",
-  "Daily Mail",
-  "PBS",
-  "BBC",
-  "Science Friday",
-  "The Science Show",
-  "Nature Biotechnology",
-  "Science News",
-  "El Español",
-  "La Stampa",
-  "Gadgette",
-  "Education Week",
+  { name: "Wired", image: "/images/media/wired.png", url: "https://www.wired.com/story/searching-for-lost-memories-under-thousands-of-microscopes/" },
+  { name: "Discover", image: "/images/media/discover.png", url: "https://www.discovermagazine.com/mind/are-clogged-blood-vessels-the-key-to-treating-alzheimers-disease" },
+  { name: "The Washington Post", image: "/images/media/washington-post.png", url: "https://www.washingtonpost.com/national/health-science/alzheimers-cure-is-being-pursued-with-the-help-of-an-online-game/2018/05/04/f6b93b28-4dff-11e8-af46-b1d6dc0d9bfe_story.html" },
+  { name: "Financial Times", image: "/images/media/financial-times.png", url: "https://www.ft.com/content/b023732c-93d8-11e7-a9e6-11d2f0ebb7f0" },
+  { name: "Women's Health", image: "/images/media/womens-health.png", url: "https://www.facebook.com/155097092254/posts/citizenscience-is-featured-in-the-may-2019-issue-of-womens-health-learn-more-abo/10155634319542255/" },
+  { name: "Daily Mail", image: "/images/media/daily-mail.png", url: "https://www.dailymail.co.uk/sciencetech/article-3380709/Superintellingence-AI-humans-working-solve-climate-change-end-wars-researchers-claim.html" },
+  { name: "PBS", image: "/images/media/pbs.png", url: "https://www.youtube.com/watch?v=k7lXJDNaQ5o" },
+  { name: "BBC", image: "/images/media/bbc.png", url: "https://www.bbc.co.uk/programmes/w3csz1p2" },
+  { name: "Science Friday", image: "/images/media/science-friday.png", url: "https://www.sciencefriday.com/segments/how-citizen-science-can-speed-up-alzheimers-research/" },
+  { name: "The Science Show", image: "/images/media/the-science-show.png", url: "https://www.abc.net.au/radionational/programs/scienceshow/citizen-scientists-help-with-alzheimer%E2%80%99s-research/9262558" },
+  { name: "Nature Biotechnology", image: "/images/media/nature-biotech.png", url: "https://stallcatchers.com/images/partners/dark/nature_biotech_citsci.pdf" },
+  { name: "Science News", image: "/images/media/science-news.png", url: "https://www.sciencenews.org/article/website-turns-alzheimers-research-game" },
+  { name: "El Español", image: "/images/media/el-espanol.png", url: "https://stallcatchers.com/images/partners/dark/elespanol-com.pdf" },
+  { name: "La Stampa", image: "/images/media/la-stampa.png", url: "https://www.lastampa.it/salute/2019/02/14/news/alzheimer-il-videogioco-con-cui-anche-tu-puoi-aiutare-gli-scienziati-a-sconfiggere-la-malattia-1.34771635" },
+  { name: "Gadgette", image: "/images/media/gadgette.png", url: "https://www.gadgette.com/2018/05/25/stall-catchers/" },
+  { name: "Education Week", image: "/images/media/education-week.png", url: "https://www.edweek.org/ew/articles/2019/05/31/students-and-researchers-team-up-to-create.html" },
 ];
 
 export default async function HomePage() {
@@ -32,18 +37,20 @@ export default async function HomePage() {
 
   const coreTeam = people.filter((p) => p.category === "core");
   const board = people.filter((p) => p.category === "board");
+  const alumni = people.filter((p) => p.category === "alumni");
   const faculty = people.filter((p) => p.category === "faculty");
 
   return (
     <>
       {/* Quote Section */}
-      <section className="bg-[var(--color-bg-light)] py-16 md:py-24">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="relative">
-            <span className="text-6xl text-[var(--color-accent)] font-serif absolute -top-8 -left-4">
-              &ldquo;
-            </span>
-            <blockquote className="text-lg md:text-xl text-gray-500 leading-relaxed italic pl-8">
+      <section className="bg-white py-16 md:py-24">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="flex gap-3">
+            <FaQuoteLeft
+              className="text-[var(--color-accent)] shrink-0 mt-1"
+              size={30}
+            />
+            <blockquote className="text-base text-gray-500 leading-relaxed" style={{ fontFamily: "var(--font-body)" }}>
               The Human Computation Institute is the first international center
               that brings together the vision and competencies needed to realize
               my father&apos;s dream of augmenting human collaboration for the
@@ -51,7 +58,7 @@ export default async function HomePage() {
               ongoing activities on behalf of the Doug Engelbart institute.
             </blockquote>
           </div>
-          <p className="mt-6 text-sm text-gray-400 italic">
+          <p className="mt-6 ml-10 text-sm text-[var(--color-accent)] italic">
             Christina Engelbart
           </p>
         </div>
@@ -64,14 +71,23 @@ export default async function HomePage() {
             In the Media
           </h3>
           <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-10" />
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-60">
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 opacity-70">
             {mediaLogos.map((logo) => (
-              <span
-                key={logo}
-                className="text-sm md:text-base font-bold text-gray-500 tracking-wider"
+              <a
+                key={logo.name}
+                href={logo.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-100 transition-opacity"
               >
-                {logo}
-              </span>
+                <Image
+                  src={logo.image}
+                  alt={logo.name}
+                  width={141}
+                  height={40}
+                  className="h-6 md:h-8 w-auto object-contain"
+                />
+              </a>
             ))}
           </div>
         </div>
@@ -100,7 +116,7 @@ export default async function HomePage() {
               className="flex flex-col items-center group"
             >
               <div className="w-24 h-24 rounded-full bg-[var(--color-accent)] flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
-                <FaAddressCard size={36} />
+                <FaAddressBook size={36} />
               </div>
               <span className="text-[var(--color-accent)] font-bold tracking-wider uppercase">
                 Partners
@@ -138,9 +154,10 @@ export default async function HomePage() {
       {partners.length > 0 && (
         <section className="py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-6">
-            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 mb-12">
+            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 uppercase tracking-wider mb-4">
               Our Partners
             </h3>
+            <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-12" />
             <div className="flex flex-wrap justify-center items-center gap-12">
               {partners.map((partner) => (
                 <a
@@ -174,39 +191,34 @@ export default async function HomePage() {
       {projects.length > 0 && (
         <section className="bg-[var(--color-bg-light)] py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-6">
-            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 mb-12">
+            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 uppercase tracking-wider mb-4">
               Our Projects
             </h3>
+            <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-12" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <Link
-                  key={project.id}
-                  href={project.link || `/projects#${project.slug}`}
-                  className="group relative overflow-hidden rounded-lg aspect-[4/3]"
-                >
-                  {project.imageUrl ? (
+              {projects
+                .filter((p) => p.imageUrl)
+                .map((project) => (
+                  <Link
+                    key={project.id}
+                    href={project.link || `/projects#${project.slug}`}
+                    className="group relative overflow-hidden rounded-lg aspect-[4/3]"
+                  >
                     <Image
-                      src={project.imageUrl}
+                      src={project.imageUrl!}
                       alt={project.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                  ) : (
-                    <div className="w-full h-full bg-[var(--color-primary)] flex items-center justify-center">
-                      <span className="text-white text-2xl font-bold">
-                        {project.name}
-                      </span>
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-end">
+                      <div className="p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <h4 className="font-bold text-lg">{project.name}</h4>
+                      </div>
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-end">
-                    <div className="p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <h4 className="font-bold text-lg">{project.name}</h4>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
             </div>
-            <div className="text-center mt-8">
+            <div className="text-center mt-10">
               <Link
                 href="/projects"
                 className="inline-block border-2 border-gray-700 text-gray-700 px-8 py-3 font-semibold tracking-wider uppercase text-sm hover:bg-gray-700 hover:text-white transition-colors"
@@ -222,9 +234,10 @@ export default async function HomePage() {
       {coreTeam.length > 0 && (
         <section className="py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-6">
-            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 mb-12">
+            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 uppercase tracking-wider mb-4">
               Core Team
             </h3>
+            <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-12" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {coreTeam.map((person) => (
                 <PersonCard
@@ -233,11 +246,7 @@ export default async function HomePage() {
                   title={person.title || ""}
                   bio={person.bio || undefined}
                   photoUrl={person.photoUrl || undefined}
-                  socialLinks={
-                    person.socialLinks
-                      ? (person.socialLinks as Record<string, string>)
-                      : undefined
-                  }
+                  socialLinks={parseSocialLinks(person.socialLinks)}
                 />
               ))}
             </div>
@@ -257,9 +266,10 @@ export default async function HomePage() {
       {board.length > 0 && (
         <section className="bg-[var(--color-bg-light)] py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-6">
-            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 mb-12">
+            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 uppercase tracking-wider mb-4">
               Board of Directors
             </h3>
+            <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-12" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {board.map((person) => (
                 <PersonCard
@@ -268,11 +278,31 @@ export default async function HomePage() {
                   title={person.title || ""}
                   bio={person.bio || undefined}
                   photoUrl={person.photoUrl || undefined}
-                  socialLinks={
-                    person.socialLinks
-                      ? (person.socialLinks as Record<string, string>)
-                      : undefined
-                  }
+                  socialLinks={parseSocialLinks(person.socialLinks)}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Alumni */}
+      {alumni.length > 0 && (
+        <section className="py-16 md:py-24">
+          <div className="max-w-6xl mx-auto px-6">
+            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 uppercase tracking-wider mb-4">
+              Alumni
+            </h3>
+            <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-12" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {alumni.map((person) => (
+                <PersonCard
+                  key={person.id}
+                  name={person.name}
+                  title={person.title || ""}
+                  bio={person.bio || undefined}
+                  photoUrl={person.photoUrl || undefined}
+                  socialLinks={parseSocialLinks(person.socialLinks)}
                 />
               ))}
             </div>
@@ -282,11 +312,12 @@ export default async function HomePage() {
 
       {/* External Faculty */}
       {faculty.length > 0 && (
-        <section className="py-16 md:py-24">
+        <section className="bg-[var(--color-bg-light)] py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-6">
-            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 mb-12">
+            <h3 className="text-3xl md:text-4xl font-bold text-center text-gray-700 uppercase tracking-wider mb-4">
               External Faculty
             </h3>
+            <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-12" />
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
               {faculty.map((person) => (
                 <PersonCard
@@ -295,11 +326,7 @@ export default async function HomePage() {
                   title={person.title || ""}
                   bio={person.bio || undefined}
                   photoUrl={person.photoUrl || undefined}
-                  socialLinks={
-                    person.socialLinks
-                      ? (person.socialLinks as Record<string, string>)
-                      : undefined
-                  }
+                  socialLinks={parseSocialLinks(person.socialLinks)}
                 />
               ))}
             </div>

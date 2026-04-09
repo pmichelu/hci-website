@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import MediaPicker from "@/components/admin/MediaPicker"
 
 function slugify(text: string) {
   return text
@@ -106,16 +107,7 @@ export default function NewPostPage() {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Featured Image URL</label>
-          <input
-            type="text"
-            value={featuredImage}
-            onChange={(e) => setFeaturedImage(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
-            placeholder="/uploads/image.jpg"
-          />
-        </div>
+        <MediaPicker label="Featured Image" value={featuredImage} onChange={setFeaturedImage} />
 
         <div className="grid grid-cols-2 gap-4">
           <div>

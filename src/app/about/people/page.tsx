@@ -2,6 +2,11 @@ import PersonCard from "@/components/PersonCard";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
+function parseSocialLinks(val: string | null | undefined): Record<string, string> | undefined {
+  if (!val) return undefined;
+  try { return typeof val === "string" ? JSON.parse(val) : val; } catch { return undefined; }
+}
+
 export const metadata: Metadata = {
   title: "People",
 };
@@ -9,8 +14,8 @@ export const metadata: Metadata = {
 const CATEGORIES = [
   { key: "core", label: "Core Team" },
   { key: "board", label: "Board of Directors" },
+  { key: "alumni", label: "Alumni" },
   { key: "faculty", label: "External Faculty" },
-  { key: "past-members", label: "Past Members" },
 ] as const;
 
 export default async function PeoplePage() {
@@ -56,11 +61,7 @@ export default async function PeoplePage() {
                     title={person.title || ""}
                     bio={person.bio || undefined}
                     photoUrl={person.photoUrl || undefined}
-                    socialLinks={
-                      person.socialLinks
-                        ? (person.socialLinks as Record<string, string>)
-                        : undefined
-                    }
+                    socialLinks={parseSocialLinks(person.socialLinks)}
                   />
                 ))}
               </div>

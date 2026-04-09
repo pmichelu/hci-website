@@ -106,12 +106,8 @@ export async function POST(
       if (body.sortOrder !== undefined) body.sortOrder = Number(body.sortOrder)
     }
 
-    if (entity === "people" && typeof body.socialLinks === "string") {
-      try {
-        body.socialLinks = JSON.parse(body.socialLinks)
-      } catch {
-        body.socialLinks = null
-      }
+    if (entity === "people" && body.socialLinks != null && typeof body.socialLinks !== "string") {
+      body.socialLinks = JSON.stringify(body.socialLinks)
     }
 
     const item = await delegate.create({ data: body })

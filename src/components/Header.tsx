@@ -31,9 +31,9 @@ const navItems = [
     label: "Publications",
     href: "/publications",
     children: [
-      { label: "Books", href: "/publications#books" },
-      { label: "Human Computation Journal", href: "/publications#journal" },
-      { label: "Articles", href: "/publications#articles" },
+      { label: "Books", href: "/publications/books" },
+      { label: "Human Computation Journal", href: "/publications/journal" },
+      { label: "Articles", href: "/publications/articles" },
     ],
   },
   { label: "Videos", href: "/videos" },
@@ -46,22 +46,18 @@ export default function Header() {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-[var(--color-bg-light)] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24">
-          <Link href="/" className="flex items-center gap-4">
+        <div className="flex items-center justify-between h-32">
+          <Link href="/" className="flex items-center">
             <Image
               src="/images/logos/hci-logo.png"
               alt="Human Computation Institute"
-              width={80}
-              height={80}
-              className="h-16 w-auto"
+              width={325}
+              height={130}
+              className="h-[110px] w-auto"
+              priority
             />
-            <div className="hidden sm:block">
-              <div className="text-lg font-bold tracking-wider text-[var(--color-primary)] leading-tight">
-                HUMAN<br />COMPUTATION<br />INSTITUTE
-              </div>
-            </div>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
@@ -76,7 +72,9 @@ export default function Header() {
               >
                 <Link
                   href={item.href}
-                  className="px-3 py-2 text-sm font-semibold tracking-wider uppercase text-gray-700 hover:text-[var(--color-primary)] transition-colors"
+                  className="px-4 py-2 font-light tracking-wider uppercase text-gray-600 hover:text-[var(--color-accent)] transition-colors"
+                  style={{ fontFamily: "var(--font-heading)", fontSize: "20px" }}
+                  {...(item.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 >
                   {item.label}
                 </Link>
@@ -95,6 +93,14 @@ export default function Header() {
                 )}
               </div>
             ))}
+            <button
+              aria-label="Search"
+              className="ml-2 p-2 text-gray-500 hover:text-[var(--color-accent)] transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+              </svg>
+            </button>
           </nav>
 
           <button

@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import MediaPicker from "@/components/admin/MediaPicker"
 
 export default function NewPublicationPage() {
   const router = useRouter()
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [link, setLink] = useState("")
+  const [imageUrl, setImageUrl] = useState("")
   const [category, setCategory] = useState("book")
   const [sortOrder, setSortOrder] = useState("0")
   const [saving, setSaving] = useState(false)
@@ -25,6 +27,7 @@ export default function NewPublicationPage() {
         title,
         description: description || undefined,
         link: link || undefined,
+        imageUrl: imageUrl || undefined,
         category,
         sortOrder: Number(sortOrder),
       }),
@@ -81,6 +84,8 @@ export default function NewPublicationPage() {
           />
         </div>
 
+        <MediaPicker label="Cover Image" value={imageUrl} onChange={setImageUrl} />
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
@@ -90,7 +95,8 @@ export default function NewPublicationPage() {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
             >
               <option value="book">Book</option>
-              <option value="journal">Journal Article</option>
+              <option value="journal">Journal</option>
+              <option value="article">Article</option>
               <option value="conference">Conference Paper</option>
               <option value="report">Report</option>
               <option value="other">Other</option>

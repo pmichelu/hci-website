@@ -86,12 +86,8 @@ export async function PUT(
       if (body.sortOrder !== undefined) body.sortOrder = Number(body.sortOrder)
     }
 
-    if (entity === "people" && typeof body.socialLinks === "string") {
-      try {
-        body.socialLinks = JSON.parse(body.socialLinks)
-      } catch {
-        body.socialLinks = null
-      }
+    if (entity === "people" && body.socialLinks != null && typeof body.socialLinks !== "string") {
+      body.socialLinks = JSON.stringify(body.socialLinks)
     }
 
     delete body.id

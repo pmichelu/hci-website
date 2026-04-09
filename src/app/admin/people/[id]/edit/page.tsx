@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
+import MediaPicker from "@/components/admin/MediaPicker"
 
 export default function EditPersonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -30,7 +31,7 @@ export default function EditPersonPage({ params }: { params: Promise<{ id: strin
         setPhotoUrl(data.photoUrl || "")
         setCategory(data.category || "core")
         setSortOrder(String(data.sortOrder ?? 0))
-        const links = data.socialLinks || {}
+        const links = data.socialLinks ? (typeof data.socialLinks === "string" ? JSON.parse(data.socialLinks) : data.socialLinks) : {}
         setTwitter(links.twitter || "")
         setLinkedin(links.linkedin || "")
         setFacebook(links.facebook || "")
@@ -117,15 +118,7 @@ export default function EditPersonPage({ params }: { params: Promise<{ id: strin
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Photo URL</label>
-          <input
-            type="text"
-            value={photoUrl}
-            onChange={(e) => setPhotoUrl(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
-          />
-        </div>
+        <MediaPicker label="Photo" value={photoUrl} onChange={setPhotoUrl} />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -135,10 +128,10 @@ export default function EditPersonPage({ params }: { params: Promise<{ id: strin
               onChange={(e) => setCategory(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
             >
-              <option value="core">Core</option>
-              <option value="board">Board</option>
-              <option value="faculty">Faculty</option>
-              <option value="past-members">Past Members</option>
+              <option value="core">Core Team</option>
+              <option value="board">Board of Directors</option>
+              <option value="alumni">Alumni</option>
+              <option value="faculty">External Faculty</option>
             </select>
           </div>
           <div>

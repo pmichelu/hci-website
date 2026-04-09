@@ -32,7 +32,7 @@ export default function PersonCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative w-48 h-48 mb-4 overflow-hidden rounded-2xl">
+      <div className="relative w-full max-w-[280px] aspect-square mb-5 overflow-hidden rounded-3xl">
         {photoUrl ? (
           <Image
             src={photoUrl}
@@ -41,29 +41,23 @@ export default function PersonCard({
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-4xl text-gray-400">
-              {name.charAt(0)}
-            </span>
-          </div>
+          <Image
+            src="/images/people/placeholder-person.svg"
+            alt={name}
+            fill
+            className="object-cover"
+          />
         )}
         {bio && isHovered && (
-          <div className="absolute inset-0 bg-black/70 flex items-center justify-center p-4 transition-opacity duration-300">
-            <p className="text-white text-xs leading-relaxed">{bio}</p>
+          <div className="absolute inset-0 bg-black/70 flex items-center justify-center p-5 transition-opacity duration-300">
+            <p className="text-white text-sm leading-relaxed">{bio}</p>
           </div>
         )}
       </div>
-      <h4 className="text-lg font-bold tracking-wider uppercase text-gray-700">
+      <h4 className="text-base font-bold tracking-wider uppercase text-gray-700">
         {name}
       </h4>
-      <p className="text-sm text-gray-500 mt-1">{title}</p>
-      {bio && !isHovered && (
-        <div className="mt-2 px-4">
-          <div className="border-t border-gray-200 pt-2">
-            <p className="text-xs text-gray-400 line-clamp-2">{bio}</p>
-          </div>
-        </div>
-      )}
+      <p className="text-sm text-gray-500 mt-1 whitespace-pre-line">{title}</p>
       {socialLinks && (
         <>
           <div className="w-full max-w-[200px] border-t border-gray-200 mt-3" />

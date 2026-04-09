@@ -2,6 +2,7 @@
 
 import { useState, useEffect, use } from "react"
 import { useRouter } from "next/navigation"
+import MediaPicker from "@/components/admin/MediaPicker"
 
 export default function EditProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -101,15 +102,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-          <input
-            type="text"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
-          />
-        </div>
+        <MediaPicker label="Image" value={imageUrl} onChange={setImageUrl} />
 
         <div className="grid grid-cols-2 gap-4">
           <div>

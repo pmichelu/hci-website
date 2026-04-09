@@ -1,3 +1,5 @@
+import Image from "next/image";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
@@ -5,98 +7,86 @@ export const metadata: Metadata = {
   title: "Publications",
 };
 
-const SECTIONS = [
-  {
-    id: "books",
-    title: "Books",
-    categories: ["book", "books"],
-  },
-  {
-    id: "journal",
-    title: "Journal",
-    categories: ["journal"],
-  },
-  {
-    id: "articles",
-    title: "Articles",
-    categories: ["article", "articles"],
-  },
-] as const;
-
 export default async function PublicationsPage() {
-  const publications = await prisma.publication.findMany({
+  const books = await prisma.publication.findMany({
+    where: { category: "book" },
+    orderBy: { sortOrder: "asc" },
+  });
+  const journals = await prisma.publication.findMany({
+    where: { category: "journal" },
     orderBy: { sortOrder: "asc" },
   });
 
-  function inSection(
-    category: string,
-    categories: readonly string[]
-  ): boolean {
-    const c = category.toLowerCase().trim();
-    return categories.some((k) => k === c);
-  }
-
   return (
-    <>
-      <section className="bg-white py-16 md:py-20">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider text-gray-700 mb-4">
-            Publications
-          </h1>
-          <div className="border-b-2 border-[var(--color-accent)] w-12 mx-auto mb-6" />
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Handbooks, journals, and articles related to human computation and our
-            work.
-          </p>
-        </div>
-      </section>
+    <section className="bg-white py-16 md:py-20">
+      <div className="max-w-4xl mx-auto px-6">
+        <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-wider text-gray-700 mb-4">
+          Publications
+        </h1>
+        <div className="border-b-2 border-[var(--color-accent)] w-12 mb-10" />
 
-      {SECTIONS.map((section, index) => {
-        const items = publications.filter((p) =>
-          inSection(p.category, section.categories)
-        );
-        const stripe =
-          index % 2 === 0 ? "bg-[var(--color-bg-light)]" : "bg-white";
-
-        return (
-          <section key={section.id} id={section.id} className={`${stripe} py-16 md:py-20`}>
-            <div className="max-w-4xl mx-auto px-6">
-              <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider text-gray-700 mb-8">
-                {section.title}
-              </h2>
-              {items.length === 0 ? (
-                <p className="text-gray-500 text-sm">No entries in this section yet.</p>
-              ) : (
-                <ul className="space-y-8">
-                  {items.map((pub) => (
-                    <li key={pub.id} className="border-b border-gray-200 pb-8 last:border-0">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                        {pub.link ? (
-                          <a
-                            href={pub.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-[var(--color-accent)]"
-                          >
-                            {pub.title}
-                          </a>
-                        ) : (
-                          pub.title
-                        )}
-                      </h3>
-                      {pub.description && (
-                        <p className="text-gray-600 text-sm leading-relaxed">
-                          {pub.description}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+        <p className="text-gray-800 font-semibold mb-4">Books</p>
+        <div className="flex flex-wrap gap-8 mb-10">
+          {books.map((book) => (
+            <figure key={book.id} className="max-w-[120px]">
+              {book.imageUrl && (
+                <Link href="/publications/books">
+                  <Image
+                    src={book.imageUrl}
+                    alt={book.title}
+                    width={120}
+                    height={180}
+                    className="rounded shadow-sm"
+                  />
+                </Link>
               )}
-            </div>
-          </section>
-        );
-      })}
-    </>
+              <figcaption className="text-xs text-gray-600 mt-2 leading-snug">
+                <Link
+                  href="/publications/books"
+                  className="hover:text-[var(--color-accent)]"
+                >
+                  {book.title}
+                </Link>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <p className="text-gray-800 font-semibold mb-4">Periodicals</p>
+        <div className="flex flex-wrap gap-8 mb-10">
+          {journals.map((j) => (
+            <figure key={j.id} className="max-w-[120px]">
+              {j.imageUrl && (
+                <Link href="/publications/journal">
+                  <Image
+                    src={j.imageUrl}
+                    alt={j.title}
+                    width={120}
+                    height={155}
+                    className="rounded shadow-sm"
+                  />
+                </Link>
+              )}
+              <figcaption className="text-xs text-gray-600 mt-2 leading-snug">
+                <Link
+                  href="/publications/journal"
+                  className="hover:text-[var(--color-accent)]"
+                >
+                  {j.title}
+                </Link>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+
+        <p className="text-gray-800 font-semibold mb-2">Articles</p>
+        <Link
+          href="/publications/articles"
+          className="text-[var(--color-accent)] hover:underline text-sm"
+        >
+          List of articles →
+        </Link>
+      </div>
+    </section>
   );
 }
