@@ -45,13 +45,14 @@ model Person {
 }
 
 model Project {
-  id          String  @id @default(cuid())
-  name        String
-  slug        String  @unique
-  description String?
-  imageUrl    String?
-  link        String?
-  sortOrder   Int     @default(0)
+  id              String  @id @default(cuid())
+  name            String
+  slug            String  @unique
+  description     String?
+  imageUrl        String?
+  link            String?
+  sortOrder       Int     @default(0)
+  newsletterSlug  String?
 }
 
 model Partner {
@@ -93,4 +94,17 @@ model SiteSetting {
   id    String @id @default(cuid())
   key   String @unique
   value String
+}
+
+model NewsletterList {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  listmonkListId  Int
+  listmonkUuid    String
+  name            String
+  description     String?
+  displayOrder    Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

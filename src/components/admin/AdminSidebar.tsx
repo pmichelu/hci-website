@@ -15,6 +15,7 @@ import {
   HiOutlineUsers,
   HiOutlineUserCircle,
   HiOutlineArrowRightStartOnRectangle,
+  HiOutlineEnvelope,
 } from "react-icons/hi2"
 
 interface AdminSidebarProps {
@@ -29,6 +30,7 @@ const navItems = [
   { href: "/admin/partners", label: "Partners", icon: HiOutlineBuildingOffice2 },
   { href: "/admin/publications", label: "Publications", icon: HiOutlineBookOpen },
   { href: "/admin/videos", label: "Videos", icon: HiOutlineVideoCamera },
+  { href: "/admin/newsletters", label: "Newsletters", icon: HiOutlineEnvelope },
   { href: "/admin/media", label: "Media", icon: HiOutlinePhoto },
   { href: "/admin/settings", label: "Settings", icon: HiOutlineCog6Tooth },
 ]

@@ -4,44 +4,45 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 
-const navItems = [
-  {
-    label: "About",
-    href: "/about",
-    children: [
-      { label: "Mission", href: "/about/mission" },
-      { label: "People", href: "/about/people" },
-      { label: "Partners", href: "/about/partners" },
-      { label: "Diversity, Equity & Inclusion", href: "/about/dei" },
-      { label: "Contact", href: "/about/contact" },
-    ],
-  },
-  {
-    label: "Projects",
-    href: "/projects",
-    children: [
-      { label: "Stall Catchers", href: "/projects#stall-catchers" },
-      { label: "Dream Catchers", href: "/projects#dream-catchers" },
-      { label: "Crowd2Map Tanzania", href: "/projects#crowd2map" },
-      { label: "Civium", href: "/projects#civium" },
-      { label: "CrowdMeter", href: "/projects#crowdmeter" },
-    ],
-  },
-  {
-    label: "Publications",
-    href: "/publications",
-    children: [
-      { label: "Books", href: "/publications/books" },
-      { label: "Human Computation Journal", href: "/publications/journal" },
-      { label: "Articles", href: "/publications/articles" },
-    ],
-  },
-  { label: "Videos", href: "/videos" },
-  { label: "Blog", href: "/blog" },
-  { label: "Donate", href: "/donate" },
-];
+interface HeaderProps {
+  projects?: { name: string; slug: string }[];
+}
 
-export default function Header() {
+export default function Header({ projects = [] }: HeaderProps) {
+  const navItems = [
+    {
+      label: "About",
+      href: "/about",
+      children: [
+        { label: "Mission", href: "/about/mission" },
+        { label: "People", href: "/about/people" },
+        { label: "Partners", href: "/about/partners" },
+        { label: "Diversity, Equity & Inclusion", href: "/about/dei" },
+        { label: "Contact", href: "/about/contact" },
+      ],
+    },
+    {
+      label: "Projects",
+      href: "/projects",
+      children: projects.map((p) => ({
+        label: p.name,
+        href: `/projects#${p.slug}`,
+      })),
+    },
+    {
+      label: "Publications",
+      href: "/publications",
+      children: [
+        { label: "Books", href: "/publications/books" },
+        { label: "Human Computation Journal", href: "/publications/journal" },
+        { label: "Articles", href: "/publications/articles" },
+      ],
+    },
+    { label: "Videos", href: "/videos" },
+    { label: "Blog", href: "/blog" },
+    { label: "Newsletters", href: "/newsletters" },
+    { label: "Donate", href: "/donate" },
+  ];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 

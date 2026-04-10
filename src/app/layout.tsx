@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { prisma } from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: {
@@ -19,11 +20,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const projects = await prisma.project.findMany({
+    orderBy: { sortOrder: "asc" },
+    select: { name: true, slug: true },
+  });
+
   return (
     <html lang="en">
       <head>
@@ -39,7 +45,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col">
-        <Header />
+        <Header projects={projects} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

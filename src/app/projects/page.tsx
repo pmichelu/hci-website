@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
+import NewsletterSignup from "@/components/NewsletterSignup";
 
 export const metadata: Metadata = {
   title: "Projects",
@@ -83,6 +84,12 @@ export default async function ProjectsPage() {
                       >
                         Visit project →
                       </Link>
+                    )}
+                    {project.newsletterSlug && (
+                      <div className="mt-6 pt-6 border-t border-gray-200">
+                        <p className="text-sm font-semibold text-gray-700 mb-2">Get updates</p>
+                        <NewsletterSignup slugs={[project.newsletterSlug]} compact />
+                      </div>
                     )}
                   </div>
                 </div>

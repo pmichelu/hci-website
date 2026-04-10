@@ -12,6 +12,7 @@ const modelMap: Record<string, string> = {
   settings: "siteSetting",
   users: "user",
   media: "mediaItem",
+  newsletters: "newsletterList",
 }
 
 function getDelegate(entity: string) {
@@ -74,6 +75,12 @@ export async function PUT(
 
     if (["people", "projects", "partners", "publications", "videos"].includes(entity)) {
       if (body.sortOrder !== undefined) body.sortOrder = Number(body.sortOrder)
+    }
+
+    if (entity === "newsletters") {
+      if (body.listmonkListId !== undefined) body.listmonkListId = Number(body.listmonkListId)
+      if (body.displayOrder !== undefined) body.displayOrder = Number(body.displayOrder)
+      if (body.active !== undefined) body.active = Boolean(body.active)
     }
 
     if (entity === "people" && body.socialLinks != null && typeof body.socialLinks !== "string") {

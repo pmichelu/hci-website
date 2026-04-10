@@ -19,6 +19,7 @@ const entityConfig: Record<
   settings: { model: "siteSetting", orderBy: { key: "asc" } },
   users: { model: "user", orderBy: { createdAt: "desc" } },
   media: { model: "mediaItem", orderBy: { createdAt: "desc" } },
+  newsletters: { model: "newsletterList", orderBy: { displayOrder: "asc" } },
 }
 
 function getModel(entity: string) {
@@ -97,6 +98,12 @@ export async function POST(
 
     if (["people", "projects", "partners", "publications", "videos"].includes(entity)) {
       if (body.sortOrder !== undefined) body.sortOrder = Number(body.sortOrder)
+    }
+
+    if (entity === "newsletters") {
+      if (body.listmonkListId !== undefined) body.listmonkListId = Number(body.listmonkListId)
+      if (body.displayOrder !== undefined) body.displayOrder = Number(body.displayOrder)
+      if (body.active !== undefined) body.active = Boolean(body.active)
     }
 
     if (entity === "people" && body.socialLinks != null && typeof body.socialLinks !== "string") {
