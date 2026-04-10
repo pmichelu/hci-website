@@ -23,12 +23,33 @@ export default function SortableList<T extends SortableItem>({
   onReordered,
 }: SortableListProps<T>) {
   const [items, setItems] = useState(initialItems)
-  const [saving, setSaving] = useState(false)
-  const [dirty, setDirty] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle")
   const dragItem = useRef<number | null>(null)
   const dragOverItem = useRef<number | null>(null)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
+  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  async function persistOrder(newItems: SortableItem[]) {
+    setSaveStatus("saving")
+    try {
+      const res = await fetch("/api/admin/reorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entity, ids: newItems.map((i) => i.id) }),
+      })
+      if (res.ok) {
+        setSaveStatus("saved")
+        onReordered?.()
+      } else {
+        setSaveStatus("error")
+      }
+    } catch {
+      setSaveStatus("error")
+    }
+    if (fadeTimer.current) clearTimeout(fadeTimer.current)
+    fadeTimer.current = setTimeout(() => setSaveStatus("idle"), 2000)
+  }
 
   const handleDragStart = useCallback((index: number) => {
     dragItem.current = index
@@ -55,53 +76,23 @@ export default function SortableList<T extends SortableItem>({
         const updated = [...prev]
         const [moved] = updated.splice(from, 1)
         updated.splice(to, 0, moved)
+        persistOrder(updated)
         return updated
       })
-      setDirty(true)
     }
 
     dragItem.current = null
     dragOverItem.current = null
     setDragIndex(null)
     setOverIndex(null)
-  }, [])
+  }, [entity])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
   }, [])
 
-  async function saveOrder() {
-    setSaving(true)
-    try {
-      const res = await fetch("/api/admin/reorder", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ entity, ids: items.map((i) => i.id) }),
-      })
-      if (res.ok) {
-        setDirty(false)
-        onReordered?.()
-      }
-    } finally {
-      setSaving(false)
-    }
-  }
-
   return (
     <div>
-      {dirty && (
-        <div className="mb-4 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-          <span className="text-sm text-amber-800">Order changed. Save to apply.</span>
-          <button
-            onClick={saveOrder}
-            disabled={saving}
-            className="px-4 py-1.5 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save Order"}
-          </button>
-        </div>
-      )}
-
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full">
           <thead>
@@ -145,6 +136,18 @@ export default function SortableList<T extends SortableItem>({
           </tbody>
         </table>
       </div>
+
+      {saveStatus !== "idle" && (
+        <div className={`mt-3 text-sm transition-opacity ${
+          saveStatus === "saving" ? "text-gray-500" :
+          saveStatus === "saved" ? "text-green-600" :
+          "text-red-600"
+        }`}>
+          {saveStatus === "saving" && "Saving..."}
+          {saveStatus === "saved" && "Order saved."}
+          {saveStatus === "error" && "Failed to save order."}
+        </div>
+      )}
     </div>
   )
 }
