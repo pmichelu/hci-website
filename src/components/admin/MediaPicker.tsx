@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import Image from "next/image"
 
 interface MediaItem {
   id: string
@@ -90,8 +89,8 @@ export default function MediaPicker({ value, onChange, label = "Image" }: MediaP
       </div>
 
       {value && isImage({ id: "", filename: "", url: value }) && (
-        <div className="mt-2 relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
-          <Image src={value} alt="Preview" fill className="object-cover" />
+        <div className="mt-2 w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+          <img src={value} alt="Preview" className="w-full h-full object-cover" />
         </div>
       )}
 
@@ -152,7 +151,7 @@ export default function MediaPicker({ value, onChange, label = "Image" }: MediaP
                         }`}
                       >
                         {isImage(item) ? (
-                          <Image src={item.url} alt={item.filename} fill className="object-cover" sizes="120px" />
+                          <img src={item.url} alt={item.filename} className="absolute inset-0 w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-400 text-xs p-2 text-center break-all">
                             {item.filename}
