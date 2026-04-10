@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   },
   description:
     "The Human Computation Institute is a nonprofit innovation center dedicated to the betterment of society through novel methods leveraging the complementary strengths of networked humans and machines.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

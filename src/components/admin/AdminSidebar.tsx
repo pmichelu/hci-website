@@ -14,6 +14,7 @@ import {
   HiOutlinePhoto,
   HiOutlineCog6Tooth,
   HiOutlineUsers,
+  HiOutlineUserCircle,
   HiOutlineArrowRightStartOnRectangle,
 } from "react-icons/hi2"
 
@@ -72,14 +73,23 @@ export default function AdminSidebar({ userName, userRole }: AdminSidebarProps) 
       </nav>
 
       <div className="border-t border-white/10 px-6 py-4">
-        <p className="text-sm text-white/70 truncate mb-3">{userName}</p>
-        <button
-          onClick={() => signOut({ callbackUrl: "/admin/login" })}
-          className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
-        >
-          <HiOutlineArrowRightStartOnRectangle className="w-4 h-4" />
-          Sign out
-        </button>
+        <p className="text-sm text-white/70 truncate mb-1">{userName}</p>
+        <div className="flex items-center gap-4 mt-2">
+          <Link
+            href="/admin/account"
+            className="flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition-colors"
+          >
+            <HiOutlineUserCircle className="w-4 h-4" />
+            Account
+          </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: "/admin/login" })}
+            className="flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition-colors"
+          >
+            <HiOutlineArrowRightStartOnRectangle className="w-4 h-4" />
+            Sign out
+          </button>
+        </div>
       </div>
     </aside>
   )
