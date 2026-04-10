@@ -6,9 +6,10 @@ interface DeleteButtonProps {
   entity: string
   id: string
   label?: string
+  onDeleted?: () => void
 }
 
-export default function DeleteButton({ entity, id, label = "Delete" }: DeleteButtonProps) {
+export default function DeleteButton({ entity, id, label = "Delete", onDeleted }: DeleteButtonProps) {
   const router = useRouter()
 
   async function handleDelete() {
@@ -16,6 +17,7 @@ export default function DeleteButton({ entity, id, label = "Delete" }: DeleteBut
 
     const res = await fetch(`/api/admin/${entity}/${id}`, { method: "DELETE" })
     if (res.ok) {
+      onDeleted?.()
       router.refresh()
     } else {
       alert("Failed to delete item")

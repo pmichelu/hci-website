@@ -29,7 +29,7 @@ export default function ProjectsList({ projects }: { projects: Project[] }) {
           <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
         </>
       }
-      renderRow={(project) => (
+      renderRow={(project, _index, removeItem) => (
         <>
           <td className="px-6 py-4 text-sm font-medium text-gray-900">{project.name}</td>
           <td className="px-6 py-4 text-sm text-gray-500">{project.slug}</td>
@@ -41,7 +41,7 @@ export default function ProjectsList({ projects }: { projects: Project[] }) {
             >
               Edit
             </Link>
-            <DeleteButton entity="projects" id={project.id} />
+            <DeleteButton entity="projects" id={project.id} onDeleted={removeItem} />
           </td>
         </>
       )}

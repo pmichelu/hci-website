@@ -10,7 +10,7 @@ interface SortableItem {
 interface SortableListProps<T extends SortableItem> {
   items: T[]
   entity: string
-  renderRow: (item: T, index: number) => React.ReactNode
+  renderRow: (item: T, index: number, removeItem: () => void) => React.ReactNode
   header: React.ReactNode
   onReordered?: () => void
 }
@@ -123,7 +123,7 @@ export default function SortableList<T extends SortableItem>({
                     <path strokeLinecap="round" d="M8 6h.01M8 12h.01M8 18h.01M16 6h.01M16 12h.01M16 18h.01" />
                   </svg>
                 </td>
-                {renderRow(item, index)}
+                {renderRow(item, index, () => setItems((prev) => prev.filter((i) => i.id !== item.id)))}
               </tr>
             ))}
             {items.length === 0 && (

@@ -29,7 +29,7 @@ export default function PartnersList({ partners }: { partners: Partner[] }) {
           <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
         </>
       }
-      renderRow={(partner) => (
+      renderRow={(partner, _index, removeItem) => (
         <>
           <td className="px-6 py-4 text-sm font-medium text-gray-900">{partner.name}</td>
           <td className="px-6 py-4 text-sm text-gray-500">
@@ -47,7 +47,7 @@ export default function PartnersList({ partners }: { partners: Partner[] }) {
             >
               Edit
             </Link>
-            <DeleteButton entity="partners" id={partner.id} />
+            <DeleteButton entity="partners" id={partner.id} onDeleted={removeItem} />
           </td>
         </>
       )}
