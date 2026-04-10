@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import PersonCard from "@/components/PersonCard";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import { FaPaintBrush, FaAddressBook, FaUsers, FaQuoteLeft } from "react-icons/fa";
 
 function parseSocialLinks(val: string | null | undefined): Record<string, string> | undefined {

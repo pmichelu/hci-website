@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import NewsletterSignup from "@/components/NewsletterSignup";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Projects",
 };

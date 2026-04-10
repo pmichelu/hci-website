@@ -2,6 +2,8 @@ import PersonCard from "@/components/PersonCard";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 function parseSocialLinks(val: string | null | undefined): Record<string, string> | undefined {
   if (!val) return undefined;
   try { return typeof val === "string" ? JSON.parse(val) : val; } catch { return undefined; }
