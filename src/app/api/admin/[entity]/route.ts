@@ -11,7 +11,6 @@ const entityConfig: Record<
     include?: Record<string, boolean>
   }
 > = {
-  posts: { model: "post", orderBy: { createdAt: "desc" }, include: { author: true } },
   people: { model: "person", orderBy: { sortOrder: "asc" } },
   projects: { model: "project", orderBy: { sortOrder: "asc" } },
   partners: { model: "partner", orderBy: { sortOrder: "asc" } },
@@ -81,12 +80,6 @@ export async function POST(
       const user = await delegate.create({ data: { ...userData, passwordHash } })
       const { passwordHash: _, ...sanitized } = user
       return NextResponse.json(sanitized, { status: 201 })
-    }
-
-    if (entity === "posts") {
-      body.authorId = session.user.id
-      if (body.publishedAt) body.publishedAt = new Date(body.publishedAt)
-      if (body.status === "published" && !body.publishedAt) body.publishedAt = new Date()
     }
 
     if (entity === "settings") {

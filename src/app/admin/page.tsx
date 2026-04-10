@@ -2,9 +2,8 @@ import { prisma } from "@/lib/prisma"
 import Link from "next/link"
 
 export default async function AdminDashboard() {
-  const [posts, people, projects, partners, publications, videos, media, users] =
+  const [people, projects, partners, publications, videos, media, users] =
     await Promise.all([
-      prisma.post.count(),
       prisma.person.count(),
       prisma.project.count(),
       prisma.partner.count(),
@@ -15,7 +14,6 @@ export default async function AdminDashboard() {
     ])
 
   const stats = [
-    { label: "Posts", count: posts, href: "/admin/posts" },
     { label: "People", count: people, href: "/admin/people" },
     { label: "Projects", count: projects, href: "/admin/projects" },
     { label: "Partners", count: partners, href: "/admin/partners" },
@@ -44,12 +42,6 @@ export default async function AdminDashboard() {
 
       <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
       <div className="flex flex-wrap gap-3">
-        <Link
-          href="/admin/posts/new"
-          className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition"
-        >
-          New Post
-        </Link>
         <Link
           href="/admin/people/new"
           className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition"

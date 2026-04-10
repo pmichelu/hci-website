@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import {
   HiOutlineHome,
-  HiOutlineDocumentText,
   HiOutlineUserGroup,
   HiOutlineRectangleGroup,
   HiOutlineBuildingOffice2,
@@ -25,7 +24,6 @@ interface AdminSidebarProps {
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: HiOutlineHome },
-  { href: "/admin/posts", label: "Posts", icon: HiOutlineDocumentText },
   { href: "/admin/people", label: "People", icon: HiOutlineUserGroup },
   { href: "/admin/projects", label: "Projects", icon: HiOutlineRectangleGroup },
   { href: "/admin/partners", label: "Partners", icon: HiOutlineBuildingOffice2 },

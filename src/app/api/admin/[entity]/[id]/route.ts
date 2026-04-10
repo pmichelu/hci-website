@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
 const modelMap: Record<string, string> = {
-  posts: "post",
   people: "person",
   projects: "project",
   partners: "partner",
@@ -32,8 +31,7 @@ export async function GET(
   const delegate = getDelegate(entity)
   if (!delegate) return NextResponse.json({ error: "Unknown entity" }, { status: 404 })
 
-  const include = entity === "posts" ? { author: true } : undefined
-  const item = await delegate.findUnique({ where: { id }, include })
+  const item = await delegate.findUnique({ where: { id } })
   if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   if (entity === "users") {
@@ -72,14 +70,6 @@ export async function PUT(
       const user = await delegate.update({ where: { id }, data: body })
       const { passwordHash, ...sanitized } = user
       return NextResponse.json(sanitized)
-    }
-
-    if (entity === "posts") {
-      if (body.publishedAt) body.publishedAt = new Date(body.publishedAt)
-      else if (body.publishedAt === "") body.publishedAt = null
-      if (body.status === "published" && !body.publishedAt) body.publishedAt = new Date()
-      delete body.author
-      delete body.authorId
     }
 
     if (["people", "projects", "partners", "publications", "videos"].includes(entity)) {
