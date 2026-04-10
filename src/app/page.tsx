@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import DynamicImage from "@/components/DynamicImage";
 import PersonCard from "@/components/PersonCard";
 import { prisma } from "@/lib/prisma";
 
@@ -82,7 +82,7 @@ export default async function HomePage() {
                 rel="noopener noreferrer"
                 className="hover:opacity-100 transition-opacity"
               >
-                <Image
+                <DynamicImage
                   src={logo.image}
                   alt={logo.name}
                   width={141}
@@ -170,7 +170,7 @@ export default async function HomePage() {
                   className="hover:opacity-80 transition-opacity"
                 >
                   {partner.logoUrl ? (
-                    <Image
+                    <DynamicImage
                       src={partner.logoUrl}
                       alt={partner.name}
                       width={160}
@@ -206,7 +206,7 @@ export default async function HomePage() {
                     href={project.link || `/projects#${project.slug}`}
                     className="group relative overflow-hidden rounded-lg aspect-[4/3]"
                   >
-                    <Image
+                    <DynamicImage
                       src={project.imageUrl!}
                       alt={project.name}
                       fill

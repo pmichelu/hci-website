@@ -1,4 +1,4 @@
-import Image from "next/image";
+import DynamicImage from "@/components/DynamicImage";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
@@ -31,7 +31,7 @@ export default async function JournalPage() {
                 rel="noopener noreferrer"
                 className="float-left mr-6 mb-4"
               >
-                <Image
+                <DynamicImage
                   src={j.imageUrl}
                   alt={j.title}
                   width={232}

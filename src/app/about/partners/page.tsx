@@ -1,4 +1,4 @@
-import Image from "next/image";
+import DynamicImage from "@/components/DynamicImage";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 
@@ -43,7 +43,7 @@ export default async function PartnersPage() {
                   className="flex items-center justify-center w-full max-w-[200px] min-h-[80px] p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
                   {partner.logoUrl ? (
-                    <Image
+                    <DynamicImage
                       src={partner.logoUrl}
                       alt={partner.name}
                       width={180}

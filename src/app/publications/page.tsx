@@ -1,4 +1,4 @@
-import Image from "next/image";
+import DynamicImage from "@/components/DynamicImage";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
@@ -33,7 +33,7 @@ export default async function PublicationsPage() {
             <figure key={book.id} className="max-w-[120px]">
               {book.imageUrl && (
                 <Link href="/publications/books">
-                  <Image
+                  <DynamicImage
                     src={book.imageUrl}
                     alt={book.title}
                     width={120}
@@ -60,7 +60,7 @@ export default async function PublicationsPage() {
             <figure key={j.id} className="max-w-[120px]">
               {j.imageUrl && (
                 <Link href="/publications/journal">
-                  <Image
+                  <DynamicImage
                     src={j.imageUrl}
                     alt={j.title}
                     width={120}

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import DynamicImage from "@/components/DynamicImage";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
@@ -50,7 +50,7 @@ export default async function ProjectsPage() {
                 <div className="grid gap-10 md:grid-cols-2 md:gap-14 items-center">
                   <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
                     {project.imageUrl ? (
-                      <Image
+                      <DynamicImage
                         src={project.imageUrl}
                         alt={project.name}
                         fill

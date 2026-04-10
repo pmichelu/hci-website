@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import DynamicImage from "@/components/DynamicImage";
 import { FaTwitter, FaLinkedinIn, FaFacebookF, FaGlobe } from "react-icons/fa";
 import { useState } from "react";
 
@@ -34,14 +34,14 @@ export default function PersonCard({
     >
       <div className="relative w-full max-w-[280px] aspect-square mb-5 overflow-hidden rounded-3xl">
         {photoUrl ? (
-          <Image
+          <DynamicImage
             src={photoUrl}
             alt={name}
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <Image
+          <DynamicImage
             src="/images/people/placeholder-person.svg"
             alt={name}
             fill
