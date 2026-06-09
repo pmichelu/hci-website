@@ -26,6 +26,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const projects = await prisma.project.findMany({
+    where: { hidden: false },
     orderBy: { sortOrder: "asc" },
     select: { name: true, slug: true },
   });

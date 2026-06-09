@@ -1,0 +1,22 @@
+---
+description: Deployment process for hci-website to Linode server
+alwaysApply: true
+---
+
+# Deployment
+
+After pushing changes to GitHub, deploy to the Linode server:
+
+```bash
+sshpass -p 'HMsmile543!mh' ssh -o StrictHostKeyChecking=no hcinst_user@173.255.232.249 \
+  "cd /home/hcinst_user/hci-website && git pull && npm run build && pm2 restart hci-website"
+```
+
+- Server: 173.255.232.249 (Linode Nanode, Ubuntu 24.04)
+- User: `hcinst_user`
+- App dir: `/home/hcinst_user/hci-website`
+- Process manager: PM2 (process name: `hci-website`)
+- Reverse proxy: Nginx (serves `/uploads/` directly from filesystem)
+- Database: SQLite at `/home/hcinst_user/hci-website/prisma/prod.db`
+
+Always deploy after committing and pushing code changes. Wait for the build to complete and verify PM2 shows "online" status.

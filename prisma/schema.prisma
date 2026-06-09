@@ -53,6 +53,7 @@ model Project {
   link            String?
   sortOrder       Int     @default(0)
   newsletterSlug  String?
+  hidden          Boolean @default(false)
 }
 
 model Partner {

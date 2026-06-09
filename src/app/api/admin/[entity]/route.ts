@@ -100,6 +100,10 @@ export async function POST(
       if (body.sortOrder !== undefined) body.sortOrder = Number(body.sortOrder)
     }
 
+    if (entity === "projects") {
+      if (body.hidden !== undefined) body.hidden = Boolean(body.hidden)
+    }
+
     if (entity === "newsletters") {
       if (body.listmonkListId !== undefined) body.listmonkListId = Number(body.listmonkListId)
       if (body.displayOrder !== undefined) body.displayOrder = Number(body.displayOrder)
