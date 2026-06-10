@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import MediaPicker from "@/components/admin/MediaPicker"
+import RichTextEditor from "@/components/admin/RichTextEditor"
 
 function slugify(text: string) {
   return text
@@ -16,6 +17,7 @@ export default function NewProjectPage() {
   const [name, setName] = useState("")
   const [slug, setSlug] = useState("")
   const [description, setDescription] = useState("")
+  const [content, setContent] = useState("")
   const [imageUrl, setImageUrl] = useState("")
   const [link, setLink] = useState("")
   const [sortOrder, setSortOrder] = useState("0")
@@ -34,6 +36,7 @@ export default function NewProjectPage() {
         name,
         slug: slug || slugify(name),
         description: description || undefined,
+        content: content || undefined,
         imageUrl: imageUrl || undefined,
         link: link || undefined,
         sortOrder: Number(sortOrder),
@@ -85,14 +88,17 @@ export default function NewProjectPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Summary</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows={4}
+            rows={3}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
+            placeholder="Brief summary shown on the projects listing page"
           />
         </div>
+
+        <RichTextEditor label="Page Content" value={content} onChange={setContent} />
 
         <MediaPicker label="Image" value={imageUrl} onChange={setImageUrl} />
 

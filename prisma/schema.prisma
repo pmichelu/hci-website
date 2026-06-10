@@ -49,6 +49,7 @@ model Project {
   name            String
   slug            String  @unique
   description     String?
+  content         String?
   imageUrl        String?
   link            String?
   sortOrder       Int     @default(0)

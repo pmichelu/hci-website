@@ -88,7 +88,18 @@ export default async function ProjectPage({
         </div>
       </section>
 
-      <section className="bg-[var(--color-bg-light)] py-10">
+      {project.content && (
+        <section className="bg-[var(--color-bg-light)] py-16 md:py-20">
+          <div className="max-w-4xl mx-auto px-6">
+            <div
+              className="prose prose-lg max-w-none prose-headings:text-gray-700 prose-headings:uppercase prose-headings:tracking-wider prose-a:text-[var(--color-accent)] prose-img:rounded-lg"
+              dangerouslySetInnerHTML={{ __html: project.content }}
+            />
+          </div>
+        </section>
+      )}
+
+      <section className="py-10 bg-white">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <Link
             href="/projects"
