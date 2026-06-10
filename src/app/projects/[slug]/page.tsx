@@ -30,6 +30,14 @@ export default async function ProjectPage({
 
   return (
     <>
+      {project.hidden && (
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `header { display: none !important; } footer { display: none !important; }`,
+          }}
+        />
+      )}
+
       <section className="bg-white py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid gap-10 md:grid-cols-2 md:gap-14 items-center">
@@ -99,16 +107,18 @@ export default async function ProjectPage({
         </section>
       )}
 
-      <section className="py-10 bg-white">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <Link
-            href="/projects"
-            className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] hover:underline"
-          >
-            ← Back to all projects
-          </Link>
-        </div>
-      </section>
+      {!project.hidden && (
+        <section className="py-10 bg-white">
+          <div className="max-w-6xl mx-auto px-6 text-center">
+            <Link
+              href="/projects"
+              className="text-sm font-bold uppercase tracking-wider text-[var(--color-primary)] hover:underline"
+            >
+              ← Back to all projects
+            </Link>
+          </div>
+        </section>
+      )}
     </>
   );
 }
