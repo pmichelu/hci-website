@@ -37,8 +37,11 @@ export default function ProjectsList({ projects }: { projects: Project[] }) {
     }
   }
 
+  const listKey = projects.map((p) => `${p.id}:${p.hidden}`).join(",")
+
   return (
     <SortableList
+      key={listKey}
       items={projects}
       entity="projects"
       onReordered={() => router.refresh()}
