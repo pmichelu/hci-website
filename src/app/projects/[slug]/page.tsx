@@ -33,7 +33,7 @@ export default async function ProjectPage({
       {project.hidden && (
         <style
           dangerouslySetInnerHTML={{
-            __html: `header { display: none !important; } footer { display: none !important; }`,
+            __html: `header nav, header button[aria-label] { display: none !important; } footer { display: none !important; }`,
           }}
         />
       )}
