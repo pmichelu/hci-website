@@ -15,6 +15,8 @@ interface RichTextEditorProps {
 
 export default function RichTextEditor({ value, onChange, label = "Content" }: RichTextEditorProps) {
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false)
+  const [linkModalOpen, setLinkModalOpen] = useState(false)
+  const [initialLinkUrl, setInitialLinkUrl] = useState("")
 
   const editor = useEditor({
     extensions: [
@@ -47,16 +49,40 @@ export default function RichTextEditor({ value, onChange, label = "Content" }: R
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const addLink = useCallback(() => {
+  const openLinkModal = useCallback(() => {
     if (!editor) return
-    const previousUrl = editor.getAttributes("link").href
-    const url = window.prompt("URL", previousUrl || "https://")
-    if (url === null) return
-    if (url === "") {
+    setInitialLinkUrl(editor.getAttributes("link").href || "")
+    setLinkModalOpen(true)
+  }, [editor])
+
+  const applyLink = useCallback((url: string) => {
+    if (!editor) return
+    const trimmed = url.trim()
+    if (trimmed === "") {
       editor.chain().focus().extendMarkRange("link").unsetLink().run()
     } else {
-      editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run()
+      const { from, to } = editor.state.selection
+      if (from === to) {
+        editor
+          .chain()
+          .focus()
+          .insertContent({
+            type: "text",
+            text: trimmed,
+            marks: [{ type: "link", attrs: { href: trimmed } }],
+          })
+          .run()
+      } else {
+        editor.chain().focus().extendMarkRange("link").setLink({ href: trimmed }).run()
+      }
     }
+    setLinkModalOpen(false)
+  }, [editor])
+
+  const removeLink = useCallback(() => {
+    if (!editor) return
+    editor.chain().focus().extendMarkRange("link").unsetLink().run()
+    setLinkModalOpen(false)
   }, [editor])
 
   const addImage = useCallback((url: string) => {
@@ -71,7 +97,7 @@ export default function RichTextEditor({ value, onChange, label = "Content" }: R
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
       <div className="border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-primary)] focus-within:border-transparent">
-        <Toolbar editor={editor} onAddLink={addLink} onAddImage={() => setMediaPickerOpen(true)} />
+        <Toolbar editor={editor} onAddLink={openLinkModal} onAddImage={() => setMediaPickerOpen(true)} />
         <EditorContent editor={editor} />
       </div>
 
@@ -79,6 +105,15 @@ export default function RichTextEditor({ value, onChange, label = "Content" }: R
         <ImagePickerModal
           onSelect={addImage}
           onClose={() => setMediaPickerOpen(false)}
+        />
+      )}
+
+      {linkModalOpen && (
+        <LinkModal
+          initialUrl={initialLinkUrl}
+          onApply={applyLink}
+          onRemove={removeLink}
+          onClose={() => setLinkModalOpen(false)}
         />
       )}
     </div>
@@ -245,6 +280,191 @@ function ImagePickerModal({ onSelect, onClose }: { onSelect: (url: string) => vo
             </div>
           )}
         </div>
+      </div>
+    </div>
+  )
+}
+
+function isImageFile(item: MediaItem) {
+  return item.mimeType?.startsWith("image/") || /\.(png|jpe?g|gif|svg|webp)$/i.test(item.url)
+}
+
+function LinkModal({
+  initialUrl,
+  onApply,
+  onRemove,
+  onClose,
+}: {
+  initialUrl: string
+  onApply: (url: string) => void
+  onRemove: () => void
+  onClose: () => void
+}) {
+  const [url, setUrl] = useState(initialUrl || "")
+  const [browsing, setBrowsing] = useState(false)
+  const [items, setItems] = useState<MediaItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [search, setSearch] = useState("")
+
+  function startBrowsing() {
+    setBrowsing(true)
+    setLoading(true)
+    fetch("/api/admin/media")
+      .then((r) => r.json())
+      .then((data) => setItems(data))
+      .finally(() => setLoading(false))
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      const res = await fetch("/api/upload", { method: "POST", body: formData })
+      if (res.ok) {
+        const item: MediaItem = await res.json()
+        setUrl(item.url)
+        setBrowsing(false)
+      }
+    } finally {
+      setUploading(false)
+      e.target.value = ""
+    }
+  }
+
+  const filtered = search
+    ? items.filter((m) => m.filename.toLowerCase().includes(search.toLowerCase()))
+    : items
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col m-4" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-bold text-gray-900">{browsing ? "Select File" : "Add Link"}</h2>
+          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+        </div>
+
+        {!browsing ? (
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Link URL</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={url}
+                  autoFocus
+                  onChange={(e) => setUrl(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      onApply(url)
+                    }
+                  }}
+                  placeholder="https://example.com or /uploads/file.pdf"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={startBrowsing}
+                  className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition whitespace-nowrap"
+                >
+                  Browse files
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">
+                Select text first, then add a link. Or leave text unselected to insert the URL.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between gap-3 pt-2">
+              {initialUrl ? (
+                <button
+                  type="button"
+                  onClick={onRemove}
+                  className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition"
+                >
+                  Remove link
+                </button>
+              ) : (
+                <span />
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-300 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onApply(url)}
+                  className="px-5 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 px-6 py-3 border-b border-gray-100">
+              <button
+                type="button"
+                onClick={() => setBrowsing(false)}
+                className="text-sm text-[var(--color-primary)] hover:underline whitespace-nowrap"
+              >
+                ← Back
+              </button>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search files..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none"
+              />
+              <label className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg text-sm font-medium hover:opacity-90 transition cursor-pointer whitespace-nowrap">
+                {uploading ? "Uploading..." : "Upload New"}
+                <input type="file" onChange={handleUpload} className="hidden" disabled={uploading} />
+              </label>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              {loading ? (
+                <div className="text-center text-gray-400 py-12">Loading files...</div>
+              ) : filtered.length === 0 ? (
+                <div className="text-center text-gray-400 py-12">No files found.</div>
+              ) : (
+                <div className="divide-y divide-gray-100">
+                  {filtered.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setUrl(item.url)
+                        setBrowsing(false)
+                      }}
+                      className="w-full flex items-center gap-3 px-2 py-2.5 hover:bg-gray-50 rounded-lg text-left transition"
+                    >
+                      {isImageFile(item) ? (
+                        <img src={item.url} alt={item.filename} className="w-10 h-10 rounded object-cover flex-shrink-0" />
+                      ) : (
+                        <span className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-lg flex-shrink-0">📄</span>
+                      )}
+                      <span className="flex-1 min-w-0">
+                        <span className="block text-sm font-medium text-gray-900 truncate">{item.filename}</span>
+                        <span className="block text-xs text-gray-400 truncate">{item.url}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
