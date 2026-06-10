@@ -102,6 +102,7 @@ export async function POST(
 
     if (entity === "projects") {
       if (body.hidden !== undefined) body.hidden = Boolean(body.hidden)
+      if (body.imageFull !== undefined) body.imageFull = Boolean(body.imageFull)
     }
 
     if (entity === "newsletters") {

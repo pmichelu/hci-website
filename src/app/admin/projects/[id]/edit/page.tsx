@@ -13,6 +13,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
   const [description, setDescription] = useState("")
   const [content, setContent] = useState("")
   const [imageUrl, setImageUrl] = useState("")
+  const [imageFull, setImageFull] = useState(false)
   const [link, setLink] = useState("")
   const [sortOrder, setSortOrder] = useState("0")
   const [newsletterSlug, setNewsletterSlug] = useState("")
@@ -31,6 +32,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
       setDescription(data.description || "")
       setContent(data.content || "")
       setImageUrl(data.imageUrl || "")
+      setImageFull(Boolean(data.imageFull))
       setLink(data.link || "")
       setSortOrder(String(data.sortOrder ?? 0))
       setNewsletterSlug(data.newsletterSlug || "")
@@ -53,6 +55,7 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
         description: description || null,
         content: content || null,
         imageUrl: imageUrl || null,
+        imageFull,
         link: link || null,
         sortOrder: Number(sortOrder),
         newsletterSlug: newsletterSlug || null,
@@ -116,6 +119,16 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
         <RichTextEditor label="Page Content" value={content} onChange={setContent} />
 
         <MediaPicker label="Image" value={imageUrl} onChange={setImageUrl} />
+
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={imageFull}
+            onChange={(e) => setImageFull(e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-[var(--color-accent)] focus:ring-[var(--color-accent)]"
+          />
+          <span className="text-sm text-gray-700">Display image in full (not cropped)</span>
+        </label>
 
         <div className="grid grid-cols-2 gap-4">
           <div>

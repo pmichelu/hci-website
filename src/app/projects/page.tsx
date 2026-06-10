@@ -49,22 +49,34 @@ export default async function ProjectsPage() {
             >
               <div className="max-w-6xl mx-auto px-6">
                 <div className="grid gap-10 md:grid-cols-2 md:gap-14 items-center">
-                  <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
-                    {project.imageUrl ? (
+                  {project.imageUrl && project.imageFull ? (
+                    <div className="flex justify-center md:justify-end">
                       <DynamicImage
                         src={project.imageUrl}
                         alt={project.name}
-                        fill
-                        className="object-cover"
+                        width={800}
+                        height={600}
+                        className="rounded-lg max-h-[480px] w-auto h-auto object-contain"
                       />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-primary)]">
-                        <span className="text-white text-xl font-bold uppercase tracking-wider px-4 text-center">
-                          {project.name}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100">
+                      {project.imageUrl ? (
+                        <DynamicImage
+                          src={project.imageUrl}
+                          alt={project.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-[var(--color-primary)]">
+                          <span className="text-white text-xl font-bold uppercase tracking-wider px-4 text-center">
+                            {project.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <div>
                     <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider text-gray-700 mb-4">
                       <Link

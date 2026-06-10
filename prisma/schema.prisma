@@ -55,6 +55,7 @@ model Project {
   sortOrder       Int     @default(0)
   newsletterSlug  String?
   hidden          Boolean @default(false)
+  imageFull       Boolean @default(false)
 }
 
 model Partner {
