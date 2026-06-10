@@ -67,7 +67,12 @@ export default async function ProjectsPage() {
                   </div>
                   <div>
                     <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider text-gray-700 mb-4">
-                      {project.name}
+                      <Link
+                        href={`/projects/${project.slug}`}
+                        className="hover:text-[var(--color-accent)] transition-colors"
+                      >
+                        {project.name}
+                      </Link>
                     </h2>
                     {project.description ? (
                       <p className="text-gray-600 leading-relaxed mb-6">
@@ -78,16 +83,12 @@ export default async function ProjectsPage() {
                         Description coming soon.
                       </p>
                     )}
-                    {project.link && (
-                      <Link
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] hover:underline"
-                      >
-                        Visit project →
-                      </Link>
-                    )}
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="inline-block text-sm font-bold uppercase tracking-wider text-[var(--color-accent)] hover:underline"
+                    >
+                      Learn more →
+                    </Link>
                     {project.newsletterSlug && (
                       <div className="mt-6 pt-6 border-t border-gray-200">
                         <p className="text-sm font-semibold text-gray-700 mb-2">Get updates</p>

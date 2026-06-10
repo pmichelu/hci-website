@@ -26,7 +26,7 @@ export default function Header({ projects = [] }: HeaderProps) {
       href: "/projects",
       children: projects.map((p) => ({
         label: p.name,
-        href: `/projects#${p.slug}`,
+        href: `/projects/${p.slug}`,
       })),
     },
     {
