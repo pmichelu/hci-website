@@ -11,9 +11,10 @@ interface NewsletterList {
 interface NewsletterSignupProps {
   slugs?: string[]
   compact?: boolean
+  buttonLabel?: string
 }
 
-export default function NewsletterSignup({ slugs, compact }: NewsletterSignupProps) {
+export default function NewsletterSignup({ slugs, compact, buttonLabel = "Subscribe" }: NewsletterSignupProps) {
   const [lists, setLists] = useState<NewsletterList[]>([])
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [email, setEmail] = useState("")
@@ -169,7 +170,7 @@ export default function NewsletterSignup({ slugs, compact }: NewsletterSignupPro
             disabled={status === "loading"}
             className="px-6 py-2.5 bg-[var(--color-accent)] text-white rounded-lg font-medium hover:opacity-90 transition disabled:opacity-50 whitespace-nowrap"
           >
-            {status === "loading" ? "Subscribing..." : "Subscribe"}
+            {status === "loading" ? "Subscribing..." : buttonLabel}
           </button>
         </div>
 

@@ -17,6 +17,8 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
   const [link, setLink] = useState("")
   const [sortOrder, setSortOrder] = useState("0")
   const [newsletterSlug, setNewsletterSlug] = useState("")
+  const [newsletterHeading, setNewsletterHeading] = useState("")
+  const [newsletterButtonLabel, setNewsletterButtonLabel] = useState("")
   const [availableNewsletters, setAvailableNewsletters] = useState<{ slug: string; name: string }[]>([])
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -36,6 +38,8 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
       setLink(data.link || "")
       setSortOrder(String(data.sortOrder ?? 0))
       setNewsletterSlug(data.newsletterSlug || "")
+      setNewsletterHeading(data.newsletterHeading || "")
+      setNewsletterButtonLabel(data.newsletterButtonLabel || "")
       setAvailableNewsletters(newsletters)
       setLoading(false)
     })
@@ -59,6 +63,8 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
         link: link || null,
         sortOrder: Number(sortOrder),
         newsletterSlug: newsletterSlug || null,
+        newsletterHeading: newsletterSlug ? (newsletterHeading || null) : null,
+        newsletterButtonLabel: newsletterSlug ? (newsletterButtonLabel || null) : null,
       }),
     })
 
@@ -164,6 +170,31 @@ export default function EditProjectPage({ params }: { params: Promise<{ id: stri
             ))}
           </select>
           <p className="text-xs text-gray-400 mt-1">Show a newsletter signup widget on this project&apos;s page</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 pl-4 border-l-2 border-gray-100">
+          <div>
+            <label className={`block text-sm font-medium mb-1 ${newsletterSlug ? "text-gray-700" : "text-gray-400"}`}>Signup Heading</label>
+            <input
+              type="text"
+              value={newsletterHeading}
+              onChange={(e) => setNewsletterHeading(e.target.value)}
+              disabled={!newsletterSlug}
+              placeholder="Get updates"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+            />
+          </div>
+          <div>
+            <label className={`block text-sm font-medium mb-1 ${newsletterSlug ? "text-gray-700" : "text-gray-400"}`}>Button Label</label>
+            <input
+              type="text"
+              value={newsletterButtonLabel}
+              onChange={(e) => setNewsletterButtonLabel(e.target.value)}
+              disabled={!newsletterSlug}
+              placeholder="Subscribe"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+            />
+          </div>
         </div>
 
         <div className="flex gap-3 pt-2">

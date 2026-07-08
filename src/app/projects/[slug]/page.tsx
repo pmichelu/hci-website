@@ -95,11 +95,12 @@ export default async function ProjectPage({
               {project.newsletterSlug && (
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <p className="text-sm font-semibold text-gray-700 mb-2">
-                    Get updates
+                    {project.newsletterHeading || "Get updates"}
                   </p>
                   <NewsletterSignup
                     slugs={[project.newsletterSlug]}
                     compact
+                    buttonLabel={project.newsletterButtonLabel || "Subscribe"}
                   />
                 </div>
               )}

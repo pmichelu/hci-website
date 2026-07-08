@@ -52,10 +52,12 @@ model Project {
   content         String?
   imageUrl        String?
   link            String?
-  sortOrder       Int     @default(0)
-  newsletterSlug  String?
-  hidden          Boolean @default(false)
-  imageFull       Boolean @default(false)
+  sortOrder             Int     @default(0)
+  newsletterSlug        String?
+  newsletterHeading     String?
+  newsletterButtonLabel String?
+  hidden                Boolean @default(false)
+  imageFull             Boolean @default(false)
 }
 
 model Partner {
