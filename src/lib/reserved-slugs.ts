@@ -21,15 +21,26 @@ export const RESERVED_SLUGS: string[] = [
 
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
+const MAX_SLUG_SEGMENTS = 3
+
 export function validatePageSlug(slug: unknown): string | null {
   if (typeof slug !== "string" || slug.length === 0) {
     return "Slug is required"
   }
-  if (!SLUG_PATTERN.test(slug)) {
-    return "Slug must be lowercase letters, numbers, and hyphens only (e.g. \"my-page\")"
+  // Slugs may be multi-segment to mirror legacy nested URLs
+  // (e.g. "hybrid-intelligence-hackathon-for-alzheimers-research/hhai2023registration").
+  if (slug.startsWith("/") || slug.endsWith("/")) {
+    return "Slug must not start or end with a slash"
   }
-  if (RESERVED_SLUGS.includes(slug)) {
-    return `Slug "${slug}" is reserved by an existing site route and cannot be used for a page`
+  const segments = slug.split("/")
+  if (segments.length > MAX_SLUG_SEGMENTS) {
+    return `Slug must have at most ${MAX_SLUG_SEGMENTS} path segments`
+  }
+  if (segments.some((segment) => !SLUG_PATTERN.test(segment))) {
+    return "Each slug segment must be lowercase letters, numbers, and hyphens only (e.g. \"my-page\" or \"legacy/path\")"
+  }
+  if (RESERVED_SLUGS.includes(segments[0])) {
+    return `Slug "${segments[0]}" is reserved by an existing site route and cannot be used for a page`
   }
   return null
 }

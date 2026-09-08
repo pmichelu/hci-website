@@ -32,7 +32,7 @@ export default async function RootLayout({
   });
 
   const pages = await prisma.page.findMany({
-    where: { hidden: false },
+    where: { status: "published" },
     orderBy: { sortOrder: "asc" },
     select: { title: true, slug: true, navParent: true },
   });

@@ -4,7 +4,7 @@ import PagesList from "./PagesList"
 
 export default async function PagesPage() {
   const pages = await prisma.page.findMany({
-    orderBy: [{ hidden: "asc" }, { sortOrder: "asc" }],
+    orderBy: [{ status: "asc" }, { sortOrder: "asc" }],
   })
 
   return (

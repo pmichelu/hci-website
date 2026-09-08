@@ -83,6 +83,61 @@ through an `expect` wrapper using the password in `.cursor/rules/deployment.mdc`
 `~/.ssh/id_ed25519.pub` into the server's `authorized_keys` would remove that friction — not done, as it
 changes server config.
 
+## Locked (2026-09-08) — the ORIGINAL WordPress server is alive and is the best recovery source
+
+The pre-rebuild WordPress install is still running on its own Linode and is a **better source than the
+Internet Archive**. Access details are in the gitignored `wpsites_server.txt` at the repo root (host, DB
+name `wp01`, DB user/password). Do not put those credentials in tracked files.
+
+- **MySQL 3306 is open** and holds the exact original `post_content` plus post IDs. 58 published
+  pages/posts survive.
+- **Apache still renders the site**, but only via the by-IP docroot path with query permalinks:
+  `http://<ip>/humancomputation.org/public_html/index.php?page_id=<ID>` (`?p=<ID>` for posts). The
+  name-based vhost 301s to `https://humancomputation.org`, which now resolves to the new server, and
+  `/?page_id=` without `index.php` 404s.
+- **Rendering beats reading the database**: many pages use plugin shortcodes (`[su_row]`, `[su_column]`,
+  `[tmm]`, `[embedyt]`) that only WordPress can expand. `/hcomp-workshop` stores zero `<img>` tags but
+  renders with columns, a team-member card and two YouTube embeds.
+- **`wp-content/uploads` is readable** under the same by-IP path. All nine 2023 hackathon slide images —
+  which the Wayback Machine never captured at all (absent from CDX, 404 from the archive) — were recovered
+  at full resolution from here.
+- The new server has **no** WordPress leftovers (searched: only `/home/hcinst_user/hci-website`), and the
+  old `wp-content` tree 404s on the new site, so every recovered image must be copied into
+  `public/uploads/recovered/` and served from there.
+- SSH to the legacy box is **publickey-only and none of the local keys are authorised** (root password auth
+  refused). HTTP + MySQL are the available channels; that is sufficient.
+
+### Trap: do not cite raw `post_content` length as evidence of archive truncation
+An earlier session claimed the archive had truncated `/nox` because the DB row is 46,073 chars while the
+recovered HTML is ~16 KB. That was wrong — it compared raw WordPress markup against cleaned HTML. Word-level
+comparison shows **881 words in both**, 414 distinct capitalised tokens in both. The verified deficiencies of
+the Wayback Machine here are uncaptured assets and unexpanded-by-crawler state, not text loss.
+
+### Tooling
+- `scripts/wp_source.py` — shared config (env vars), content cleaning, `wpautop`, image localisation.
+- `scripts/recover-legacy-page.py <wp-slug> [<output-slug>]` — **primary** recovery: renders via the legacy
+  WordPress, cleans, pulls images into `public/uploads/recovered/`, writes `docs/recovered/<slug>.html`.
+- `scripts/recover-all.sh` — re-recovers the whole staged set; idempotent.
+- `scripts/wp-inventory.py [--all]` — every published legacy page/post cross-checked against the live site.
+- `scripts/recover-wayback-page.py` — fallback for when the legacy box is gone.
+- `prisma/restore-legacy-pages.ts [--force]` — manifest-driven upsert into the `Page` table; creates
+  everything `disabled`; never downgrades a status an editor raised; `fixes` array carries deliberate
+  content corrections (currently the `demo.betacatcheres.com` typo) so they survive re-recovery.
+  Supersedes the deleted `prisma/import-recovered-page.ts`.
+
+### Legacy inventory result (2026-09-08)
+58 published items in the legacy DB; **55 legacy URLs 404 on the new site**. Full listing:
+`python3 scripts/wp-inventory.py`. Several have equivalents under new paths (`/mission` →
+`/about/mission`, `/articles` → `/publications/articles`, `/staff` + `/core-team` → `/about/people`,
+project pages → `/projects/<slug>`); the ~12 legacy blog posts have no home at all, because the new
+`/blog` is just an outbound link. Staged so far (all `disabled` except `beta-catchers-events`, which is
+`hidden`): `hcomp-workshop`, `nox`, `media`, the HHAI hackathon page + its two subpages, and redirect-only
+entries for `civium`, `dream-catchers`, `crowdmeter`, `crowd2map-tanzania`,
+`support-the-human-computation-institute`. Not yet touched: the microvolunteering set
+(`microvolunteering-60-minute-session-diy`, `-30-minutes-diy`, `-15-minutes-session`, `supported-event`,
+`msftleague`), `events`, `workshop`, `ecsa-irb-workshop`, `board-of-directors-2`, `briefs`, `tldr`,
+`882-2` (21 KB, untitled), the duplicate `external-faculty` rows, and all legacy posts.
+
 ## Traps
 
 - A stale `.next` directory (mixed `next build` + `next dev` artifacts) makes **every** dev route 404,

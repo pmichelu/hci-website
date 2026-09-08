@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { validatePageSlug } from "@/lib/reserved-slugs"
+import { isPageStatus, validateRedirectTo } from "@/lib/page-status"
 import bcrypt from "bcryptjs"
 
 const entityConfig: Record<
@@ -108,7 +109,17 @@ export async function POST(
     }
 
     if (entity === "pages") {
-      if (body.hidden !== undefined) body.hidden = Boolean(body.hidden)
+      if (body.status !== undefined && !isPageStatus(body.status)) {
+        return NextResponse.json(
+          { error: 'Status must be one of "disabled", "hidden", "published"' },
+          { status: 400 },
+        )
+      }
+      if (body.redirectTo !== undefined) {
+        const redirectError = validateRedirectTo(body.redirectTo)
+        if (redirectError) return NextResponse.json({ error: redirectError }, { status: 400 })
+        if (body.redirectTo === "" || body.redirectTo === null) body.redirectTo = null
+      }
       if (body.navParent === "") body.navParent = null
       const slugError = validatePageSlug(body.slug)
       if (slugError) return NextResponse.json({ error: slugError }, { status: 400 })

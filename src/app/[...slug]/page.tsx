@@ -1,29 +1,43 @@
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { normalizePageStatus } from "@/lib/page-status";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
+async function findPage(slug: string) {
+  return prisma.page.findUnique({ where: { slug } });
+}
+
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const page = await prisma.page.findUnique({ where: { slug } });
-  if (!page) return { title: "Page Not Found" };
+  const page = await findPage(slug.join("/"));
+  if (!page || normalizePageStatus(page.status) === "disabled") {
+    return { title: "Page Not Found" };
+  }
   return { title: page.title };
 }
 
 export default async function ContentPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string[] }>;
 }) {
   const { slug } = await params;
-  const page = await prisma.page.findUnique({ where: { slug } });
+  const page = await findPage(slug.join("/"));
 
   if (!page) notFound();
+
+  const status = normalizePageStatus(page.status);
+
+  // Disabled pages are admin-only: always 404, even if a redirect target is set.
+  if (status === "disabled") notFound();
+
+  if (page.redirectTo) permanentRedirect(page.redirectTo);
 
   return (
     <section className="bg-[var(--color-bg-light)] py-16 md:py-20">
