@@ -77,6 +77,29 @@ pm2 restart hci-website
 200 with 2 tables / 22 cells, header+footer present, zero references in the home-page nav; `/`,
 `/about/mission`, `/projects`, `/blog`, `/videos`, `/newsletters`, `/donate` all 200; unknown slug 404s.
 
+### Second deployment, same day — commit `c44be37` (three-state status, redirects, nested slugs)
+
+```
+cp prisma/prod.db prisma/prod.db.bak-$(date +%Y%m%d-%H%M%S)      # backup: prod.db.bak-20260908-224557
+git pull
+npx tsx prisma/migrate-page-status.ts dump                        # BEFORE the push; reads hidden via raw SQL
+npx prisma db push --accept-data-loss                             # drops Page.hidden, adds status/redirectTo
+npx prisma generate
+npx tsx prisma/migrate-page-status.ts apply                       # hidden→"hidden", visible→"published"
+npx tsx prisma/restore-legacy-pages.ts [--force]                  # stage legacy pages (all disabled)
+npm run build && pm2 restart hci-website
+```
+
+Images are **not** deployed by git — `public/uploads` is gitignored and nginx serves `/uploads/` via
+`alias /home/hcinst_user/hci-website/public/uploads/`. Copy them separately:
+`scp -r public/uploads/recovered hcinst_user@<host>:/home/hcinst_user/hci-website/public/uploads/`
+(35 files, 19 MB, done 2026-09-08; verified `https://humancomputation.org/uploads/recovered/Hackathon-3.png`
+returns 200 / 735,725 bytes).
+
+Production verified: all 11 staged legacy URLs 404 (disabled, as intended); `/beta-catchers-events` 200 with
+2 tables / 22 cells and the typo fix applied; `/`, `/about/mission`, `/projects`, `/projects/civium`, `/blog`,
+`/videos`, `/newsletters`, `/donate`, `/admin/login` all 200; no staged page appears in the home-page nav.
+
 **SSH access note**: `sshpass` is not installed on the Mac and no SSH key is authorised for
 `hcinst_user@173.255.232.249` (key auth returns "Permission denied (publickey,password)"), so deploys go
 through an `expect` wrapper using the password in `.cursor/rules/deployment.mdc`. Installing
