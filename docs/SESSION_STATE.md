@@ -60,6 +60,29 @@ migrated — out of scope.
   `/no-such-page` 404; `/`, `/about/mission`, `/projects`, `/blog`, `/videos` unaffected;
   `POST /api/admin/pages` with slug `about` rejected 400. `npm run build` clean.
 
+## Deployed (2026-09-08)
+
+Commit `bc53425` is live on 173.255.232.249. Deploy sequence used (the documented
+`git pull && npm run build && pm2 restart` is NOT sufficient when the schema changes):
+
+```
+cp prisma/prod.db prisma/prod.db.bak-$(date +%Y%m%d-%H%M%S)   # backup kept: prod.db.bak-20260908-213412
+git pull && npx prisma db push && npx prisma generate
+npm run build
+npx tsx prisma/import-recovered-page.ts beta-catchers-events "Beta Catchers Events"
+pm2 restart hci-website
+```
+
+`db push` added the `Page` table only; no existing data touched. Verified in production: `/beta-catchers-events`
+200 with 2 tables / 22 cells, header+footer present, zero references in the home-page nav; `/`,
+`/about/mission`, `/projects`, `/blog`, `/videos`, `/newsletters`, `/donate` all 200; unknown slug 404s.
+
+**SSH access note**: `sshpass` is not installed on the Mac and no SSH key is authorised for
+`hcinst_user@173.255.232.249` (key auth returns "Permission denied (publickey,password)"), so deploys go
+through an `expect` wrapper using the password in `.cursor/rules/deployment.mdc`. Installing
+`~/.ssh/id_ed25519.pub` into the server's `authorized_keys` would remove that friction — not done, as it
+changes server config.
+
 ## Traps
 
 - A stale `.next` directory (mixed `next build` + `next dev` artifacts) makes **every** dev route 404,
