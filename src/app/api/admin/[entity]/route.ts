@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { validatePageSlug } from "@/lib/reserved-slugs"
 import bcrypt from "bcryptjs"
 
 const entityConfig: Record<
@@ -20,6 +21,7 @@ const entityConfig: Record<
   users: { model: "user", orderBy: { createdAt: "desc" } },
   media: { model: "mediaItem", orderBy: { createdAt: "desc" } },
   newsletters: { model: "newsletterList", orderBy: { displayOrder: "asc" } },
+  pages: { model: "page", orderBy: { sortOrder: "asc" } },
 }
 
 function getModel(entity: string) {
@@ -96,13 +98,20 @@ export async function POST(
       }
     }
 
-    if (["people", "projects", "partners", "publications", "videos"].includes(entity)) {
+    if (["people", "projects", "partners", "publications", "videos", "pages"].includes(entity)) {
       if (body.sortOrder !== undefined) body.sortOrder = Number(body.sortOrder)
     }
 
     if (entity === "projects") {
       if (body.hidden !== undefined) body.hidden = Boolean(body.hidden)
       if (body.imageFull !== undefined) body.imageFull = Boolean(body.imageFull)
+    }
+
+    if (entity === "pages") {
+      if (body.hidden !== undefined) body.hidden = Boolean(body.hidden)
+      if (body.navParent === "") body.navParent = null
+      const slugError = validatePageSlug(body.slug)
+      if (slugError) return NextResponse.json({ error: slugError }, { status: 400 })
     }
 
     if (entity === "newsletters") {

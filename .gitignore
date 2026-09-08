@@ -54,3 +54,6 @@ mysql-export.json
 
 # server notes (contains credentials)
 wpsites_server.txt
+
+# archived AI chat transcripts (local context only)
+old_chats/

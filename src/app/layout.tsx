@@ -31,6 +31,12 @@ export default async function RootLayout({
     select: { name: true, slug: true },
   });
 
+  const pages = await prisma.page.findMany({
+    where: { hidden: false },
+    orderBy: { sortOrder: "asc" },
+    select: { title: true, slug: true, navParent: true },
+  });
+
   return (
     <html lang="en">
       <head>
@@ -46,7 +52,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col">
-        <Header projects={projects} />
+        <Header projects={projects} pages={pages} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

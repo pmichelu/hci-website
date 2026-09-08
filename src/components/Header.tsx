@@ -6,10 +6,17 @@ import { useState } from "react";
 
 interface HeaderProps {
   projects?: { name: string; slug: string }[];
+  pages?: { title: string; slug: string; navParent: string | null }[];
 }
 
-export default function Header({ projects = [] }: HeaderProps) {
-  const navItems = [
+interface NavItem {
+  label: string;
+  href: string;
+  children?: { label: string; href: string }[];
+}
+
+export default function Header({ projects = [], pages = [] }: HeaderProps) {
+  const navItems: NavItem[] = [
     {
       label: "About",
       href: "/about",
@@ -43,6 +50,29 @@ export default function Header({ projects = [] }: HeaderProps) {
     { label: "Newsletters", href: "/newsletters" },
     { label: "Donate", href: "/donate" },
   ];
+
+  const topLevelPages: NavItem[] = [];
+  for (const page of pages) {
+    const child = { label: page.title, href: `/${page.slug}` };
+    const parentLabel =
+      page.navParent === "about"
+        ? "About"
+        : page.navParent === "projects"
+          ? "Projects"
+          : page.navParent === "publications"
+            ? "Publications"
+            : null;
+    const parent = parentLabel
+      ? navItems.find((item) => item.label === parentLabel)
+      : null;
+    if (parent) {
+      parent.children = [...(parent.children ?? []), child];
+    } else {
+      topLevelPages.push(child);
+    }
+  }
+  const donateIndex = navItems.findIndex((item) => item.label === "Donate");
+  navItems.splice(donateIndex, 0, ...topLevelPages);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
