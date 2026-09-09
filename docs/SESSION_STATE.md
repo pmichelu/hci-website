@@ -168,6 +168,38 @@ types (`employees`, `clients`, `projects`, `services`, `tmm`, `news`) 404 on a b
 `?post_type=<type>&p=<ID>`. The 7 remaining uncaptured items are plugin component records that 301
 instead of rendering; their content is in the SQL dump.
 
+### crowdmeter.app: preserve now, rebuild later (2026-09-09, user decision)
+
+Scope decision: **do not migrate crowdmeter.app to current infrastructure now.** The site is too
+outdated to re-serve as-is (dead MailChimp list, "Notify me when you go live!" button on a shipped
+app, untouched theme demo pages). It is preserved locally so an updated version can be built when
+wanted. No nginx vhost, DNS change or certificate was created; DNS still points crowdmeter.app at the
+legacy box.
+
+- `~/archives/humancomputation-legacy-wp-2026-09-08/crowdmeter.app/static-mirror/` — self-contained
+  faithful static copy, 9 pages / 28 assets / 2.3 MB, every original URL preserved including the
+  WordPress `/index.php/` prefix. Verified: all 9 pages 200, all 12 asset refs on the three real pages
+  resolve. Rebuild with `scripts/mirror-crowdmeter.py` (`--drop-dead-form` to replace the MailChimp
+  block with a project-page link; default is faithful).
+- `<site>/rendered-offline/` for humancomputation.org (124 pages) and civium.io — same snapshots with
+  theme/plugin/core assets localised so they still render after the box dies;
+  `scripts/make-archive-offline.py`. `rendered/` stays faithful. 5 of 210 assets were already missing
+  on the legacy server.
+- Archive is now 1,705 files / 413 MB with refreshed SHA256SUMS.
+
+**⚠ Open risk, must be resolved before or when the legacy box is retired**: the CrowdMeter iOS and
+Android apps are published (`apps.apple.com/us/app/crowdmeter/id1581145687`,
+`play.google.com/store/apps/details?id=org.hcinst.crowdmeterapp`) and app-store listings must point at
+a reachable privacy policy. Both privacy URLs are `https://crowdmeter.app/index.php/...`, that host has
+served an expired/mismatched certificate since 2026-06-14, and retiring the box removes its last
+server. Either serve the mirror at those paths, redirect them, or update the store listings.
+
+**Newsletter facts (verified 2026-09-09)**: MailChimp is no longer used at all; listmonk is self-hosted
+at `mail.hcinst.org`. Lists are id 4 `live-stall-catchers-link`, 7 `beta-catchers-updates`,
+8 `polyplus-updates`, 9 `hch2-workshop` — there is no CrowdMeter list. A static page cannot POST
+directly to listmonk's public form: `/subscription/form` requires a per-page-load nonce and exposes
+only a generic "Opt-in list".
+
 ### Tooling
 - `scripts/wp_source.py` — shared config (env vars), content cleaning, `wpautop`, image localisation.
 - `scripts/recover-legacy-page.py <wp-slug> [<output-slug>]` — **primary** recovery: renders via the legacy
