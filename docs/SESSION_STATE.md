@@ -136,6 +136,38 @@ recovered HTML is ~16 KB. That was wrong — it compared raw WordPress markup ag
 comparison shows **881 words in both**, 414 distinct capitalised tokens in both. The verified deficiencies of
 the Wayback Machine here are uncaptured assets and unexpanded-by-crawler state, not text loss.
 
+### The legacy box is NOT purely an archive — it still serves crowdmeter.app (2026-09-08)
+
+DNS at time of check: `humancomputation.org` → 173.255.232.249 (new site), `civium.io` →
+97.107.130.118 (a different, current server — the "Civium portal box" in `~/.ssh/config`),
+**`crowdmeter.app` → 45.56.103.32, the legacy WordPress box itself**. Decommissioning that box
+therefore takes crowdmeter.app down with it.
+
+- **crowdmeter.app is already broken in browsers**: it 301s HTTP→HTTPS, and the certificate served is
+  issued for `CN=civium.io` and expired **2026-06-14**. Every visitor gets an SSL error. Unresolved.
+- **The `wp02` (civium.io) database on the legacy box is an abandoned Feb-2021 stub** — two published
+  items, no uploads, no activity since 2021-02-01 — but its `siteurl`/`home` are still
+  `https://civium.io`. It is NOT the live Civium site and must never be restored anywhere answering for
+  that hostname. Flagged by the user, verified, and documented in the archive README.
+- All recovery work touched the legacy box **by IP over HTTP and MySQL only**; no live host was contacted
+  beyond DNS lookups.
+
+### Offline capture of the legacy box (2026-09-08)
+
+`~/archives/humancomputation-legacy-wp-2026-09-08/` — 1,283 files, 352 MB, deliberately OUTSIDE the repo
+because the dumps contain `wp_users` password hashes. Produced by
+`scripts/archive-legacy-wordpress.py` (`--dry-run` to size first; resumable — re-running skips files
+already present). Contents: full SQL dumps of all three databases (wp01/wp02/wp03), the complete
+`wp-content/uploads` mirror (1,135 files for humancomputation.org, 10 for crowdmeter.app, civium.io has
+none — its month directories are empty), rendered HTML for 124 of 131 published items, `manifest.json`,
+`SHA256SUMS` and a README with restore notes.
+
+Two capture gotchas, both fixed in the script: the top-level `uploads/` index is not listable (an index
+file blocks it), so directories are seeded from `_wp_attached_file` plus year probing; and custom post
+types (`employees`, `clients`, `projects`, `services`, `tmm`, `news`) 404 on a bare `?p=<ID>` and need
+`?post_type=<type>&p=<ID>`. The 7 remaining uncaptured items are plugin component records that 301
+instead of rendering; their content is in the SQL dump.
+
 ### Tooling
 - `scripts/wp_source.py` — shared config (env vars), content cleaning, `wpautop`, image localisation.
 - `scripts/recover-legacy-page.py <wp-slug> [<output-slug>]` — **primary** recovery: renders via the legacy
