@@ -200,6 +200,31 @@ at `mail.hcinst.org`. Lists are id 4 `live-stall-catchers-link`, 7 `beta-catcher
 directly to listmonk's public form: `/subscription/form` requires a per-page-load nonce and exposes
 only a generic "Opt-in list".
 
+### Microvolunteering pages restored live (2026-09-24)
+
+Reported 404ing by the user; they are standalone pages shared by direct link, so they were imported
+straight to `status: "hidden"` (viewable at their URL, absent from navigation) rather than staged as
+disabled. Deployed at commit `b38bb52` and verified in production: all five 200, 8 assets 200, zero
+navigation leakage.
+
+- `/microvolunteering-15-minutes-session`, `/microvolunteering-30-minutes-diy`,
+  `/microvolunteering-60-minute-session-diy`, `/supported-event`
+- plus `/more-info-on-stall-catchers`, a dependency: all four linked to it through a stale WordPress
+  **preview** URL (`?page_id=1367&preview=true`) that would have 404'd. `MORE_INFO_FIX` in
+  `prisma/restore-legacy-pages.ts` rewrites it, covering the `&amp;`, `&#038;` and bare `&` spellings —
+  the rendered output uses `&amp;`, so fixing only the entity form silently does nothing (it did, once;
+  always verify the fix applied in the rendered page, not just that the manifest has it).
+- `Entry.status` was added to the manifest so an entry can be created live; existing rows still keep
+  whatever status an editor set, and `--force` still never downgrades a raised status.
+- Assets live in `public/uploads/recovered/` (43 files now) and must be copied to production
+  separately: `public/uploads` is gitignored. `scp` through a temp directory —
+  `expect` does not expand a `*` glob passed as one argument.
+
+### Open: legacy `/wphci/` publication PDFs are broken
+`Publication.link` rows point at `https://humancomputation.org/wphci/wp-content/uploads/...` (e.g. the
+Michelucci manifesto and synthesis pre-prints), which 404 on the new site — verified 2026-09-24. The
+files are recoverable from the legacy box or the local archive; not yet done.
+
 ### Tooling
 - `scripts/wp_source.py` — shared config (env vars), content cleaning, `wpautop`, image localisation.
 - `scripts/recover-legacy-page.py <wp-slug> [<output-slug>]` — **primary** recovery: renders via the legacy
