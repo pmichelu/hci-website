@@ -32,8 +32,22 @@ type Entry = {
   redirectTo?: string
   /** deliberate corrections to the original content, applied on every import */
   fixes?: [find: string, replace: string][]
+  /** status for NEW rows only; existing rows keep whatever an editor set */
+  status?: "disabled" | "hidden" | "published"
   note?: string
 }
+
+/**
+ * All four microvolunteering pages linked to "More Info on Stall Catchers"
+ * through a stale WordPress *preview* URL. WordPress stored the ampersand
+ * entity-encoded, and the rendered output uses &amp;, so all three spellings are
+ * handled here rather than guessed at.
+ */
+const MORE_INFO_FIX: [string, string][] = [
+  ["https://humancomputation.org/?page_id=1367&amp;preview=true", "/more-info-on-stall-catchers"],
+  ["https://humancomputation.org/?page_id=1367&#038;preview=true", "/more-info-on-stall-catchers"],
+  ["https://humancomputation.org/?page_id=1367&preview=true", "/more-info-on-stall-catchers"],
+]
 
 const ENTRIES: Entry[] = [
   // --- recovered content -----------------------------------------------
@@ -62,6 +76,47 @@ const ENTRIES: Entry[] = [
     title: "Register for HHAI 2023 Hackathon",
     content: true,
     note: "Body is a Google Forms iframe; the form may be closed.",
+  },
+
+  // --- microvolunteering set: unlinked but publicly viewable -------------
+  // Requested live 2026-09-24; these are standalone pages shared by direct
+  // link, so they go straight to "hidden" rather than being staged.
+  // They all linked to "More Info on Stall Catchers" through a stale
+  // WordPress preview URL, rewritten by MORE_INFO_FIX to the restored page.
+  {
+    slug: "microvolunteering-15-minutes-session",
+    title: "DIY microvolunteering - 15 minutes",
+    content: true,
+    status: "hidden",
+    fixes: MORE_INFO_FIX,
+  },
+  {
+    slug: "microvolunteering-30-minutes-diy",
+    title: "DIY microvolunteering - 30 minutes",
+    content: true,
+    status: "hidden",
+    fixes: MORE_INFO_FIX,
+  },
+  {
+    slug: "microvolunteering-60-minute-session-diy",
+    title: "DIY microvolunteering - 60 minutes",
+    content: true,
+    status: "hidden",
+    fixes: MORE_INFO_FIX,
+  },
+  {
+    slug: "supported-event",
+    title: "Facilitated microvolunteering event",
+    content: true,
+    status: "hidden",
+    fixes: MORE_INFO_FIX,
+  },
+  {
+    slug: "more-info-on-stall-catchers",
+    title: "More Info on Stall Catchers",
+    content: true,
+    status: "hidden",
+    note: "Linked from all four microvolunteering pages, so it must stay viewable with them.",
   },
 
   // --- legacy URLs that now live elsewhere ------------------------------
@@ -108,11 +163,11 @@ async function main() {
           title: entry.title,
           content,
           redirectTo: entry.redirectTo ?? null,
-          status: "disabled",
+          status: entry.status ?? "disabled",
           sortOrder: 0,
         },
       })
-      console.log(`created  ${entry.slug.padEnd(62)} ${entry.redirectTo ? `redirect -> ${entry.redirectTo}` : `${content?.length ?? 0} bytes`}`)
+      console.log(`created  ${entry.slug.padEnd(50)} ${(entry.status ?? "disabled").padEnd(9)} ${entry.redirectTo ? `redirect -> ${entry.redirectTo}` : `${content?.length ?? 0} bytes`}`)
     } else if (force) {
       await prisma.page.update({
         where: { slug: entry.slug },
